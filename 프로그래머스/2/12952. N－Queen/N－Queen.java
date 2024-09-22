@@ -9,7 +9,7 @@ class Solution {
         return answer;
     }
     
-    private boolean check(int row, int col){
+    private boolean check(int row, int col, int n){
         
         for(int i=0;i<row;i++){
             
@@ -17,14 +17,15 @@ class Solution {
             if(queen[i] == col)
                 return false;
             
-            // 같은 대각선인지
-            // if(Math.abs(queen[i]-i) == Math.abs(col-row))
-            //     return false;
-            // if(Math.abs(queen[i]+i) == Math.abs(col+row))
-            //     return false;
+            // 오른쪽 대각선
+            if(Math.abs(queen[i]-i+n) == Math.abs(col-row+n))
+                return false;
+            // 왼쪽 대각선
+            if(Math.abs(queen[i]+i) == Math.abs(col+row))
+                return false;
             
-            if (Math.abs(queen[i] - col) == Math.abs(i - row)) 
-                return false;   
+            // if (Math.abs(queen[i] - col) == Math.abs(i - row)) 
+            //     return false;   
         }
         
         return true;
@@ -38,7 +39,7 @@ class Solution {
         }
         
         for(int i=0; i<n; i++){
-            if(check(row, i)){
+            if(check(row, i, n)){
                 queen[row] = i;   
                 backTracking(row+1, n);
             }
