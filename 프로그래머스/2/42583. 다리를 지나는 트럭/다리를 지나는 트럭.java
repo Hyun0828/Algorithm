@@ -2,66 +2,49 @@ import java.util.*;
 
 class Solution {
     public int solution(int bridge_length, int weight, int[] truck_weights) {
-        // 다리 위에 올라간 트럭들의 무게 합 : int sumWeightOnBridge
-        // 다리 위에 올라간 트럭 개수 : int countTruckOnBridge
-        // 다리 위에서 트럭이 어디에 있느냐,, 맨 앞에 있으면 트럭이 새로 못 올라가니까,, "다리 위의 트럭 위치를 어떻게 표현할까"
-        // 모든 트럭의 위치를 표현 X -> 맨 앞에 있냐 없냐만 변수로 두는거지, boolean isFront;
-        // 트럭들은 다리에 들어간 시각을 같이 class로 넣고, queue.peek().time이 현재시각에서 뺀 값이 bridge_length일 때 빠져나옴
+        int answer = 0;
+        int idx = 0;
+        int current_weight = 0;
+        int current_time = 1;
+        Queue<Truck> bridge = new LinkedList<>();
         
-        int truckIndex = 0;
-        int sumWeightOnBridge = 0;
-        int countTruckOnBridge = 0;
-        boolean isFront = false;
-        int currentTime = 1;
-        Queue<Truck> queue = new LinkedList<>();
-        
-        while(true){
-            // 마지막 트럭이 터널에서 탈출 먼저 하고
-            if(!queue.isEmpty()) {
-                Truck lastTruck = queue.peek();
-                // 터널에서 빠져나옴
-                if(currentTime - lastTruck.enterTime == bridge_length){
-                    queue.poll();
-                    sumWeightOnBridge -= truck_weights[lastTruck.idx];
-                    countTruckOnBridge -= 1;
+        while(true){            
+            // 다리에서 맨 앞에 있는 트럭이 다리에서 나올 수 있으면
+            if(!bridge.isEmpty()){
+                Truck firstTruck = bridge.peek();
+                if(current_time - firstTruck.enterTime >= bridge_length){
+                    bridge.poll();
+                    current_weight -= firstTruck.weight;
                 }
             }
             
-            if(truckIndex == truck_weights.length && queue.isEmpty())
+            if(idx == truck_weights.length && bridge.isEmpty()){
                 break;
-            
-            
-            // 트럭이 남아있다면
-            if(truckIndex < truck_weights.length){
-                // 무게가 넘치면 X
-                if(sumWeightOnBridge + truck_weights[truckIndex] > weight){
-                    currentTime++;
-                    continue;
-                } 
-
-                // 다리에 올라갈 수 있는 트럭 수를 초과하면 X
-                if(countTruckOnBridge + 1 > bridge_length){
-                    currentTime++;
-                    continue;
-                }
-                
-                queue.add(new Truck(truckIndex, currentTime));
-                sumWeightOnBridge += truck_weights[truckIndex++];
-                countTruckOnBridge += 1;
             }
             
-            currentTime++;
+            // 트럭이 다리 위로 올라갈 수 있으면
+            if(idx < truck_weights.length){
+               if(bridge.size() + 1 <= bridge_length && current_weight + truck_weights[idx] <= weight){
+                    bridge.add(new Truck(truck_weights[idx], current_time));
+                    current_weight += truck_weights[idx];
+                    idx++;
+                } 
+            }
+            
+            current_time++;
         }
+        // 1 3 4 6 
         
-        return currentTime;
+        
+        return current_time;
     }
     
-    static class Truck {
-        int idx;
+    public static class Truck {
+        int weight;
         int enterTime;
         
-        public Truck(int idx, int enterTime){
-            this.idx = idx;
+        public Truck(int weight, int enterTime){
+            this.weight = weight;
             this.enterTime = enterTime;
         }
     }
