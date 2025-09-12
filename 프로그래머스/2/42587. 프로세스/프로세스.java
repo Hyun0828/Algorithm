@@ -1,95 +1,55 @@
 import java.util.*;
 
 class Solution {
-    Queue<Process> queue = new LinkedList<>();
-    PriorityManager pm = new PriorityManager();
-    
     public int solution(int[] priorities, int location) {
-        init(priorities); // 실행 대기 큐 초기화
-        return run(location); // 프로세스 실행
-    }
-    
-    public void init(int[] priorities){
+        int answer = 0;
+        int playIdx = 1;
+        
+        int[] arr = new int[10];
+        Queue<Process> queue = new LinkedList<>();
+        
         for(int i=0; i<priorities.length; i++){
-            Process process = new Process(i, priorities[i]);
-            queue.add(process);
-            pm.add(priorities[i]);
+            arr[priorities[i]]++;
+            queue.add(new Process(priorities[i], i));
         }
-    }
-    
-    public int run(int location){
-        int count = 0;
+        
         while(!queue.isEmpty()){
             Process process = queue.poll();
+            int priority = process.priority;
             
-            // 우선순위가 더 높은 프로세스가 있다면 다시 큐에 넣는다.
-            if(process.getPriority() < pm.getMaxPriority()){
-                queue.add(process);    
-            } 
-            // 만약 그런 프로세스가 없다면 방금 꺼낸 프로세스를 실행한다.
-            else {
-                count++;
-                // max_priority 조정 로직
-                pm.decrease();
-                // 순서를 알고 싶은 프로세스라면
-                if(process.getNumber() == location){
+            // 우선순위가 큰 프로세스가 있다면
+            if(check(arr, priority)){
+                queue.add(process);
+            } else {
+                if(process.idx == location){
+                    answer = playIdx++;
+                    arr[priority]--;
                     break;
+                } else {
+                    playIdx++;
+                    arr[priority]--;
                 }
             }
         }
-        return count;
-    }
-}
-
-class PriorityManager{
-    private PriorityQueue<Integer> maxHeap;
-    private Map<Integer, Integer> map;
-    
-    public PriorityManager(){
-        this.maxHeap = new PriorityQueue<>(Collections.reverseOrder());
-        map = new HashMap<>();
-    }
-    
-    public void add(int priority){
-        map.put(priority, map.getOrDefault(priority,0)+1);
-        if(map.get(priority) == 1)
-            maxHeap.add(priority);
-    }
-    
-    public void decrease(){
-        if(maxHeap.isEmpty())
-            return;
         
-        int max_priority = maxHeap.peek();
-        map.put(max_priority, map.get(max_priority)-1);
-        
-        if(map.get(max_priority) == 0){
-            maxHeap.poll();
-            map.remove(max_priority);
+        return answer;
+    }
+    
+    public boolean check(int[] arr, int priority){
+        for(int i=priority + 1; i<10; i++){
+            if(arr[i] > 0)
+                return true;
         }
+        return false;
     }
     
-    public int getMaxPriority(){
-        if(maxHeap.isEmpty())
-            return -1;
-        return maxHeap.peek();
-    }
-}
-
-class Process{
-    private int number;
-    private int priority;
-    
-    public Process(int number, int priority){
-        this.number = number;
-        this.priority = priority;
-    }
-    
-    public int getNumber(){
-        return this.number;
-    }
-    
-    public int getPriority(){
-        return this.priority;
+    public static class Process {
+        int priority;
+        int idx;
+        
+        public Process(int priority, int idx){
+            this.priority = priority;
+            this.idx = idx;
+        }
     }
 }
