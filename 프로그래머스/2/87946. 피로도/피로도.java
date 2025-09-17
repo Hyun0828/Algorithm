@@ -2,25 +2,27 @@ import java.util.*;
 
 class Solution {
     
-    private boolean[] visited;
-    private int max = 0;
+    int answer = 0;
     
     public int solution(int k, int[][] dungeons) {
-        visited = new boolean[dungeons.length];
-        backtracking(k, 0, dungeons);
-        
-        return max;
+        permutation(k, dungeons, new HashSet<>());
+        return answer;
     }
     
-    public void backtracking(int k, int count, int[][] dungeons){
+    public void permutation(int k, int[][] dungeons, Set<Integer> visited){
+        answer = Math.max(answer, visited.size());
         
-        max = Math.max(max, count);
+        if(visited.size() == dungeons.length)
+            return;
         
         for(int i=0; i<dungeons.length; i++){
-            if(!visited[i] && k >= dungeons[i][0]){
-                visited[i] = true;
-                backtracking(k-dungeons[i][1], count+1, dungeons);
-                visited[i] = false;
+            if(visited.contains(i))
+                continue;
+            
+            if(k >= dungeons[i][0] && k >= dungeons[i][1]){
+                visited.add(i);
+                permutation(k-dungeons[i][1], dungeons, visited);
+                visited.remove(i);
             }
         }
     }
