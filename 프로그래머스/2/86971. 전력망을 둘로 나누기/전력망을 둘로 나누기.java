@@ -2,72 +2,81 @@ import java.util.*;
 
 class Solution {
     
-    static int[] parent;
-    static int[] rank;
+    int[] rank;
+    int[] parent;
     
     public int solution(int n, int[][] wires) {
-        int answer = 10000000;
+        int answer = 100000000;
         
         for(int i=0; i<wires.length; i++){
-            init(n);
-            
+            rank = new int[n+1];
+            parent = new int[n+1];
+            for(int j=1; j<=n; j++){
+                rank[j] = 0;
+                parent[j] = j;
+            }
+        
             for(int j=0; j<wires.length; j++){
                 if(i==j)
                     continue;
-                int v1 = wires[j][0];
-                int v2 = wires[j][1];
                 
-                union(v1, v2);
+                int x = wires[j][0];
+                int y = wires[j][1];
+                
+                union(x, y);
             }
             
-            // 트리가 2개인 지 + 두 트리의 송전탑 개수 비교
             Map<Integer, Integer> map = new HashMap<>();
-            for(int k=1; k<=n; k++){
-                int root = find(k);
+            for(int j=1; j<=n; j++){
+                int root = find(j);
                 map.put(root, map.getOrDefault(root, 0) + 1);
             }
             
-            if(map.keySet().size() == 2){
-                Iterator<Integer> iter = map.keySet().iterator();
-                int count1 = map.get(iter.next());
-                int count2 = map.get(iter.next());
-                
-                answer = Math.min(answer, Math.abs(count1 - count2));
+            if(map.size() != 2){
+                continue;
             }
+            
+            List<Integer> keys = new ArrayList<>();
+            for(Integer k : map.keySet()){
+                keys.add(k);
+            }
+            
+            int v1 = 0;
+            int v2 = 0;
+            for(int j=0; j<2; j++){
+                if(j==0)
+                    v1 = map.get(keys.get(j));
+                else if(j==1)
+                    v2 = map.get(keys.get(j));
+            }
+            
+            answer = (int)Math.min(answer, Math.abs(v1-v2));
         }
         
         return answer;
     }
     
-    public static void init(int n){
-        parent = new int[n+1];
-        rank = new int[n+1];
-        
-        for(int i=1; i<=n; i++){
-            parent[i] = i;
-            rank[i] = 0;
-        }
-    }
-    
-    public static int find(int x){
-        if(parent[x] == x)
+    public int find(int x){
+        if(x==parent[x]){
             return x;
+        }
         return parent[x] = find(parent[x]);
     }
     
-    public static void union(int a, int b){
-        int parentA = find(a);
-        int parentB = find(b);
+    public void union(int a, int b){
+        int A = find(a);
+        int B = find(b);
         
-        if(parentA == parentB)
+        if(A == B){
             return;
+        }
         
-        if(rank[parentA] > rank[parentB])
-            parent[parentB] = parentA;
-        else{
-            parent[parentA] = parentB;
-            if(rank[parentA] == rank[parentB]){
-                rank[parentB]++;
+        if(rank[A] > rank[B]){
+            parent[B] = A;
+        } else {
+            parent[A] = B;
+            if(rank[A] == rank[B]){
+                rank[B]++;
             }
         }
     }
