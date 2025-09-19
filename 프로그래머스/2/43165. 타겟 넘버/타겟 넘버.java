@@ -1,45 +1,42 @@
+import java.util.*;
+
 class Solution {
     
     int answer = 0;
+    
     public int solution(int[] numbers, int target) {
-        
-        char[] arr = new char[numbers.length]; // +, -를 순서대로 저장한다.
-        DFS(0, arr, numbers, target);
-        
+        bfs(numbers, target);
         return answer;
     }
     
-    private int calculate(char[] arr, int[] numbers){
-        int sum = 0;
+    public void bfs(int[] numbers, int target){
+        Queue<Node> queue = new LinkedList<>();
+        queue.add(new Node(-1, 0));
         
-        for(int i=0; i<numbers.length; i++){
-            if(arr[i] == '+')
-                sum += numbers[i];
-            else if(arr[i] == '-')
-                sum -= numbers[i];
+        while(!queue.isEmpty()){
+            Node node = queue.poll();
+            int idx = node.height;
+            int value = node.value;
+            
+            if(value == target && idx == numbers.length - 1){
+                answer++;
+            }
+            
+            if(idx + 1 < numbers.length){
+                queue.add(new Node(idx+1, value+numbers[idx+1]));
+                queue.add(new Node(idx+1, value-numbers[idx+1]));
+            }
+
         }
-        
-        return sum;
     }
     
-    private void DFS(int idx, char[] arr, int[] numbers, int target){
+    public static class Node {
+        int height;
+        int value;
         
-        if(idx == numbers.length){
-            if(calculate(arr, numbers) == target)
-                answer++;
-            return;
+        public Node(int height, int value){
+            this.height = height;
+            this.value = value;
         }
-        
-        for(int i=0; i<2; i++){
-            if(i==0){
-                arr[idx] = '+';
-                DFS(idx+1, arr, numbers, target);
-            }
-            else{
-                arr[idx] = '-';
-                DFS(idx+1, arr, numbers, target);
-            }
-        }
-        
     }
 }
