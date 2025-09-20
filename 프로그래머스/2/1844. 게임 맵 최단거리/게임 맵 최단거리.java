@@ -5,62 +5,40 @@ class Solution {
         int n = maps.length;
         int m = maps[0].length;
         
-        int answer = BFS(n, m, maps);
-        if(answer == 1){
+        bfs(maps, n, m);
+        
+        if(maps[n-1][m-1] == 1)
             return -1;
-        }
-        return answer;
-    }
-    
-    public static int BFS(int n, int m, int[][] maps){
-        Queue<Point> queue = new LinkedList<>();
-        boolean[][] visited = new boolean[n][m];
-        int[] dx = new int[]{-1, 1, 0, 0};
-        int[] dy = new int[]{0, 0, 1, -1};
-        
-        queue.add(new Point(0, 0));
-        
-        while(!queue.isEmpty()){
-            Point current = queue.poll();
-            int x = current.x;
-            int y = current.y;
-            
-            if(visited[y][x])
-                continue;
-            
-            visited[y][x] = true;
-            
-            for(int i=0; i<4; i++){
-                int nx = x + dx[i];
-                int ny = y + dy[i];
-                
-                // 맵을 벗어나면
-                if(ny < 0 || ny >= n || nx < 0 || nx >= m)
-                    continue;
-                
-                // 벽이면
-                if(maps[ny][nx] == 0)
-                    continue;
-                
-                // 이미 방문했다면
-                if(visited[ny][nx])
-                    continue;
-                
-                queue.add(new Point(nx,ny));
-                maps[ny][nx] = maps[y][x] + 1;
-            }
-        }
-        
         return maps[n-1][m-1];
     }
     
-    static class Point {
-        int x;
-        int y;
+    public void bfs(int[][] maps, int n, int m){
+        Queue<int[]> queue = new LinkedList<>();
+        boolean[][] visited = new boolean[n][m];
+        int[] dx = {-1, 1, 0 ,0};
+        int[] dy = {0, 0, -1, 1};
         
-        public Point(int x, int y){
-            this.x=x;
-            this.y=y;
+        queue.add(new int[]{0, 0});
+        
+        while(!queue.isEmpty()){
+            int[] current = queue.poll();
+            int y = current[0];
+            int x = current[1];
+            
+            if(visited[y][x])
+                continue;
+            visited[y][x] = true;
+            
+            for(int i=0; i<4; i++){
+                int ny = y + dy[i];
+                int nx = x + dx[i];
+                
+                if(ny < 0 || ny >= n || nx < 0 || nx >= m || visited[ny][nx] || maps[ny][nx] == 0)
+                    continue;
+                
+                maps[ny][nx] = maps[y][x] + 1;
+                queue.add(new int[]{ny, nx});
+            }
         }
     }
 }
