@@ -1,87 +1,35 @@
 import java.util.*;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 
 class Solution {
     public int[] solution(String s) {
-        List<String> results = this.extractContents(s);
-        Partition[] tuples = new Partition[results.size()];
         
-        for(int i=0; i<results.size(); i++){
-            Partition partition = createPartition(results.get(i));
-            tuples[i] = partition;
+        List<Set<Integer>> list = new ArrayList<>();
+
+        // 걍 집합 표기에 대해 숫자 개수로 오름차순 정렬하고, 왼쪽부터 순서를 올바르게 하나씩 넣기
+        String[] temp = s.substring(2, s.length()-2).split("\\},\\{");
+        for(int i=0; i<temp.length; i++){
+            String[] tmp = temp[i].split(",");
+            Set<Integer> set = new HashSet<>();
+            for(int j=0; j<tmp.length; j++)
+                set.add(Integer.parseInt(tmp[j]));
+            list.add(set);
         }
-        Arrays.sort(tuples);
+        Collections.sort(list, (a,b) -> a.size() - b.size());
+        int[] answer = new int[list.size()];
+        Set<Integer> a = list.get(0);
+        Set<Integer> t = new HashSet<>(a);
+        for(Integer i : a)
+            answer[0] = i;
         
-        return getRealTuple(tuples);
-    }
-    
-    public int[] getRealTuple(Partition[] tuples){
-        List<Integer> realTuple = new ArrayList<>();
-        Set<Integer> set = new HashSet<>();
-        
-        for(int i=0; i<tuples.length; i++){
-            int[] arr = tuples[i].getArr();
-            for(int j=0; j<arr.length; j++){
-                if(!set.contains(arr[j])){
-                    realTuple.add(arr[j]);
-                    set.add(arr[j]);
-                }
+        for(int i=1; i<list.size(); i++){
+            Set<Integer> b = list.get(i);
+            b.removeAll(t);
+            for(Integer j : b){
+                answer[i] = j;
+                t.add(j);
             }
         }
         
-        return realTuple.stream()
-            .mapToInt(Integer::intValue)
-            .toArray();
-    }
-    
-    public List<String> extractContents(String input) {
-        List<String> contents = new ArrayList<>();
-        Pattern pattern = Pattern.compile("\\{([^{}]+)\\}");
-        Matcher matcher = pattern.matcher(input);
-
-        while (matcher.find()) {
-            contents.add(matcher.group(1));
-        }
-        return contents;
-    }
-    
-    public Partition createPartition(String input){
-        String[] temp = input.split(",");
-        int length = temp.length;
-        
-        int[] arr = new int[length];
-        for(int i=0; i<length; i++){
-            arr[i] = Integer.parseInt(temp[i]);
-        }
-        
-        return new Partition(arr, length);
-    }
-    
-    public static class Partition implements Comparable<Partition>{
-        private int[] arr;
-        private int length;
-        
-        public Partition(){
-            
-        }
-        
-        public Partition(int[] arr, int length){
-            this.arr = arr;
-            this.length= length;
-        }
-        
-        public int[] getArr(){
-            return Arrays.copyOf(this.arr, this.arr.length);
-        }
-        
-        public int getLength(){
-            return this.length;
-        }
-        
-        @Override
-        public int compareTo(Partition other){
-            return Integer.compare(this.length, other.length);
-        }
+        return answer;
     }
 }
