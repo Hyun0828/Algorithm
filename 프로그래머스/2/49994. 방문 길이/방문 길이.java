@@ -2,39 +2,66 @@ import java.util.*;
 
 class Solution {
     public int solution(String dirs) {
+        int cy = 0;
+        int cx = 0;
         Set<String> visited = new HashSet<>();
-        int x = 0;
-        int y = 0;
         
-        for(char dir : dirs.toCharArray()){
-            int dx = 0;
-            int dy = 0;
-            if(dir == 'L'){
-                dx--;
-            } else if (dir == 'R'){
-                dx++;
-            } else if (dir == 'U'){
-                dy++;
-            } else if (dir == 'D'){
-                dy--;
+        for(int i=0; i<dirs.length(); i++){
+            char c = dirs.charAt(i);
+            
+            if(c == 'U') {
+                int ny = cy + 1;
+                int nx = cx;
+                if(check(ny, nx)){
+                    String s1 = cy + "," + cx + "," + ny + "," + nx;   
+                    String s2 = ny + "," + nx + "," + cy + "," + cx;
+                    visited.add(s1);
+                    visited.add(s2);
+                    cy = ny;
+                    cx = nx;
+                }
+            } else if(c == 'D'){
+                int ny = cy - 1;
+                int nx = cx;
+                if(check(ny, nx)){
+                    String s1 = cy + "," + cx + "," + ny + "," + nx;   
+                    String s2 = ny + "," + nx + "," + cy + "," + cx;
+                    visited.add(s1);
+                    visited.add(s2);
+                    cy = ny;
+                    cx = nx;
+                } 
+            } else if(c == 'R'){
+                int ny = cy;
+                int nx = cx + 1;
+                if(check(ny, nx)){
+                    String s1 = cy + "," + cx + "," + ny + "," + nx;   
+                    String s2 = ny + "," + nx + "," + cy + "," + cx;
+                    visited.add(s1);
+                    visited.add(s2);
+                    cy = ny;
+                    cx = nx;
+                }
+            } else if(c == 'L'){
+                int ny = cy;
+                int nx = cx - 1;
+                if(check(ny, nx)){
+                    String s1 = cy + "," + cx + "," + ny + "," + nx;   
+                    String s2 = ny + "," + nx + "," + cy + "," + cx;
+                    visited.add(s1);
+                    visited.add(s2);
+                    cy = ny;
+                    cx = nx;
+                }
             }
-            
-            int nx = x+dx;
-            int ny = y+dy;
-            
-            if(nx < -5 || nx > 5 || ny < -5 || ny > 5)
-                continue;
-            
-            String path = x + "," + y + "," + nx + "," + ny;
-            String rpath = nx + "," + ny + "," + x + "," + y;
-            visited.add(path);
-            visited.add(rpath);
-            
-            x = nx;
-            y = ny;
         }
         
-        
-        return visited.size()/2;
+        return visited.size() / 2;
+    }
+    
+    public boolean check(int y, int x){
+        if(y < -5 || y > 5 || x < -5 || x > 5)
+            return false;
+        return true;
     }
 }
