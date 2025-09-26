@@ -1,25 +1,30 @@
 import java.util.*;
 
 class Solution {
+    int answer = 0;
+    int index = 0;
     
-    Map<String, Integer> map = new HashMap<>();
-    int idx = 1;
-    
-    public int solution(String word) {
-        dfs(new char[]{'A', 'E', 'I', 'O', 'U'}, "");
-        return map.get(word);
+    public int solution(String word) {        
+        char[] arr = new char[]{'A', 'E', 'I', 'O', 'U'};
+        dfs(arr, "", word);
+        return answer;
     }
     
-    public void dfs(char[] arr, String s){
-        if(!s.equals(""))   
-            map.put(s, idx++);
+    public void dfs(char[] arr, String s, String target) {    
+        index++;
         
-        if(s.length() == 5){
+        if(s.equals(target)){
+            answer = index - 1;
             return;
         }
         
+        if(s.length() == 5) {
+            return;
+        }
+        
+
         for(int i=0; i<5; i++){
-            dfs(arr, s + arr[i]);
+            dfs(arr, s+arr[i], target);
         }
     }
 }
