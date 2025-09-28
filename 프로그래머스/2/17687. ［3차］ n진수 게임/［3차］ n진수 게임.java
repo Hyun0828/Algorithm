@@ -2,30 +2,35 @@ import java.util.*;
 
 class Solution {
     public String solution(int n, int t, int m, int p) {
-        StringBuilder sb = new StringBuilder();
+        String answer = "";
         
-        int num = 0; // 차례로 올라가는 십진수
-        int order = 1; // 몇 번째 사람이 대답할 차례인지
+        int number = 0; // 현재 숫자
+        int index = 1; // 차례(순번)
+        boolean isEnd = false;
         
-        while (true) {
-            String s = Integer.toString(num, n);
-            for (char c : s.toCharArray()){
-                if (order == p) {
-                    if (Character.isLowerCase(c)){
-                        c = Character.toUpperCase(c);
-                    }
-                    sb.append(c);
-                    t--;
-                    if (t==0){
-                        return sb.toString();
+        while(true){
+            String s = Integer.toString(number, n);
+            for(int i=0; i<s.length(); i++){
+                char c = s.charAt(i); // 한 사람은 c 하나씩 돌아가면서 말한다.
+                c = Character.toUpperCase(c);
+                // 튜브의 차례일 때
+                int idx = index % m;
+                if(idx == 0)
+                    idx = m;
+                if(idx == p){
+                    answer += c;
+                    if(answer.length() == t){
+                        isEnd = true;
+                        break;
                     }
                 }
-                order += 1;
-                if (order > m) {
-                    order=1;
-                } 
+                index++;
             }
-            num++;
+            if(isEnd)
+                break;
+            number++;
         }
+        
+        return answer;
     }
 }
