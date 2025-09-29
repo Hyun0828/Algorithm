@@ -2,50 +2,47 @@ import java.util.*;
 
 class Solution {
     public int[] solution(String msg) {
-        List<Integer> answer = new ArrayList<>();
+        List<Integer> result = new ArrayList<>();
         
-        // 사전 : Map<String, Integer> dict
-        // 마지막 색인번호 : lastIndex
-        
-        // w를 찾는 로직 
-        // 사전의 색인번호 : dict.get(w)
-        // 입력에서 w를 제거하는건, 그냥 msg에서 pointer 업데이트
-        // w 뒤에 문자가 남아 있으면, 사전에 등록 dict.add(w+c, lastIndex++);
-        
+        // 사전
         Map<String, Integer> dict = new HashMap<>();
-        int lastIndex = 26;
+        int index = 27;
         
-        // 사전 초기화
-        for(int i=0; i<26; i++){
-            dict.put(String.valueOf((char)('A'+i)), i+1);
+        for(int i=1; i<=26; i++){
+            dict.put("" + (char)('A' + i - 1), i);
         }
         
         for(int i=0; i<msg.length(); i++){
-            String findMsg = "";
+            // 2. i부터 시작하는 사전에서 현재 입력과 일치하는 가장 긴 문자열 w를 찾는다.
+            String w = msg.substring(i, i+1);
             int end = i;
-            for(int j=msg.length()-1; j>=i; j--){
-                String sub = msg.substring(i, j+1);
-                if(dict.containsKey(sub)){
-                    findMsg = sub;
+            for(int j=i; j<msg.length(); j++){
+                String t = msg.substring(i, j+1);
+                if(dict.containsKey(t) && w.length() < t.length()){
+                    w = t;
                     end = j;
-                    break;
                 }
             }
             
-            // 색인 번호 출력
-            int index = dict.get(findMsg);
-            answer.add(index);
+            // System.out.println("w : " + w);
             
-            // 입력 문자 제거
-            i = end;
+            // 3. w에 해당하는 색인 번호를 출력하고 입력에서 w를 제거한다.
+            result.add(dict.get(w));
             
-            // 뒤에 문자가 있으면 합쳐서 사전에 추가
-            if(end <= msg.length() - 2){
-                dict.put(findMsg + msg.charAt(end + 1), ++lastIndex);
+            // 4. 처리되지 않은 다음 글자가 남아있다면 해당하는 단어를 사전에 등록한다.
+            if(end < msg.length() - 1){
+                String wc = msg.substring(i, end+2);
+                dict.put(wc, index++);
+                // System.out.println("w + c : " + wc);
             }
+            
+            if(i < end)
+                i = end;
         }
         
-        
-        return answer.stream().mapToInt(Integer::intValue).toArray();
+        int[] answer = new int[result.size()];
+        for(int i=0; i<answer.length; i++)
+            answer[i] = result.get(i);
+        return answer;
     }
 }
