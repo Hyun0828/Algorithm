@@ -9,21 +9,21 @@ class Solution {
             pq.add(scoville[i]);
         }
         
-        while(!pq.isEmpty()){
-            int least = pq.peek();
-            if(least >= K){
+        while(true){
+            if(!pq.isEmpty() && pq.peek() >= K)
                 break;
-            }
             
-            int a = pq.poll();
-            if(pq.isEmpty()){
-                answer = -1;
-                break;
+            if(pq.size() == 1 && pq.peek() < K)
+                return -1;
+            
+            if(pq.size() >= 2){
+                int s1 = pq.poll();
+                int s2 = pq.poll();
+                pq.add(s1 + 2 * s2);
+                answer++;
             }
-            int b = pq.poll();
-            pq.add(a+b*2);
-            answer++;
         }
+        
         
         return answer;
     }
