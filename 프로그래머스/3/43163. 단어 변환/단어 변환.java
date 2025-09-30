@@ -2,62 +2,63 @@ import java.util.*;
 
 class Solution {
     public int solution(String begin, String target, String[] words) {
-        return bfs(begin, target, words);
+        int answer = 0;
+        
+        Set<String> dict = new HashSet<>();
+        for(int i=0; i<words.length; i++)
+            dict.add(words[i]);
+        
+        // BFS에서 높이
+        if(!dict.contains(target))
+            return 0;
+        return bfs(begin, target, dict);
     }
     
-    public List<String> convert(String begin, String[] words){
-        List<String> list = new ArrayList<>();
-        for(int i=0; i<begin.length(); i++){
-            for(String word : words){
-                boolean isSame = true;
-                for(int j=0; j<begin.length(); j++){
-                    if(i==j)
-                        continue;
-                    if(begin.charAt(j) != word.charAt(j))
-                        isSame = false;
-                }
-                if(isSame)
-                    list.add(word);
-            }
-        }
-        return list;
-    }
     
-    public int bfs(String begin, String target, String[] words){
+    public int bfs(String begin, String target, Set<String> dict){
         Queue<Node> queue = new LinkedList<>();
         Set<String> visited = new HashSet<>();
-        
         queue.add(new Node(begin, 0));
+        visited.add(begin);
         
         while(!queue.isEmpty()){
-            Node node = queue.poll();
+            Node cur = queue.poll();
+            String s = cur.word;
+            int height = cur.height;
             
-            if(node.s.equals(target))
-                return node.height;
+            if(s.equals(target)){
+                return height;
+            }
             
-            if(visited.contains(node.s))
-                continue;
-            visited.add(node.s);
-            
-            // convert로 변경 가능 단어들을 받아와서 queue에 넣기
-            List<String> list = convert(node.s, words);
-            for(String s : list){
-                if(visited.contains(s))
+            for(String d : dict){
+                if(d.length() != s.length())
                     continue;
-                queue.add(new Node(s, node.height+1));
+                
+                int count = 0;
+                for(int i=0; i<s.length(); i++){
+                    char sc = s.charAt(i);
+                    char dc = d.charAt(i);
+                    if(sc != dc){
+                        count++;
+                    }
+                }
+                
+                if(count == 1){
+                    visited.add(d);
+                    queue.add(new Node(d, height+1));
+                }
             }
         }
-        
         return 0;
     }
     
     public static class Node {
-        String s;
+        String word;
         int height;
         
-        public Node(String s, int height){
-            this.s=s;
-            this.height=height;
+        public Node(String word, int height){
+            this.word = word;
+            this.height= height;
         }
     }
 }
