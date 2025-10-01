@@ -1,52 +1,88 @@
 import java.util.*;
 
 class Solution {
-    public String[] solution(String[] files) {        
-        List<File> arr = new ArrayList<>();
+    public String[] solution(String[] files) {
+        List<A> list = new ArrayList<>();
         
-        for(String f : files){
-            File file = parseFile(f);
-            arr.add(file);
+        for(int i=0; i<files.length; i++){
+            list.add(convert(files[i], i));
         }
+        Collections.sort(list);
         
-        String[] answer = new String[arr.size()];
-        
-        arr.sort(Comparator
-                .comparing((File f) -> f.head)
-                .thenComparingInt(f -> f.num));
-        
-        for(int i=0; i<arr.size(); i++){
-            answer[i] = arr.get(i).file;
+        String[] answer = new String[list.size()];
+        for(int i=0; i<list.size(); i++){
+            answer[i] = list.get(i).file;
         }
         
         return answer;
     }
     
-    public File parseFile(String file){
+    public A convert(String file, int idx){
+        String head="";
+        int number=0;
+        String tail="";
+        
         for(int i=0; i<file.length(); i++){
-            Character c = file.charAt(i);
-            if(Character.isDigit(c)){
-                int j = i;
-                while(j < file.length() && j - i < 5 && Character.isDigit(file.charAt(j))){
+            if(Character.isDigit(file.charAt(i))){
+                head = file.substring(0, i);
+                boolean isEnd = false;
+                int j = i+1;
+                while(j-i+1 <= 5 && j < file.length() && Character.isDigit(file.charAt(j))){
                     j++;
                 }
-                String head = file.substring(0, i).toUpperCase();
-                int num = Integer.parseInt(file.substring(i, j));
-                return new File(file, head, num);
+                number = Integer.parseInt(file.substring(i, j));
+                tail = file.substring(j);
+                break;
+                
+//                 for(int j=i+1; j<file.length(); j++){
+//                     if(j-i+1 > 5 && Character.isDigit(file.charAt(j))){
+//                         number = Integer.parseInt(file.substring(i, j));
+//                         tail = file.substring(j);
+//                         isEnd = true;
+//                         break;
+//                     }
+                    
+//                     if(!Character.isDigit(file.charAt(j))){
+//                         number = Integer.parseInt(file.substring(i, j));
+//                         tail = file.substring(j);
+//                         isEnd = true;
+//                         break;
+//                     }
+//                 }
+                
+                // if(isEnd)
+                //     break;
             }
         }
-        return null;
+        return new A(file, head, number, tail, idx);
     }
     
-    static class File {
+    public static class A implements Comparable<A>{
         String file;
         String head;
-        int num;
+        int number;
+        String tail;
+        int idx;
         
-        public File(String f, String h, int n){
-            this.file=f;
-            this.head=h;
-            this.num=n;
+        public A(String file, String head, int number, String tail, int idx){
+            this.file=file;
+            this.head=head;
+            this.number=number;
+            this.tail=tail;
+            this.idx=idx;
+        }
+        
+        @Override
+        public int compareTo(A a){
+            if(this.head.toUpperCase().equals(a.head.toUpperCase())){
+                if(this.number == a.number){
+                    return this.idx - a.idx;
+                } else {
+                    return this.number - a.number;
+                }
+            } else {
+                return this.head.compareToIgnoreCase(a.head);
+            }
         }
     }
 }
