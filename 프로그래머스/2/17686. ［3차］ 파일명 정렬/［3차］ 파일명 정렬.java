@@ -25,33 +25,29 @@ class Solution {
         for(int i=0; i<file.length(); i++){
             if(Character.isDigit(file.charAt(i))){
                 head = file.substring(0, i);
-                boolean isEnd = false;
-                int j = i+1;
-                while(j-i+1 <= 5 && j < file.length() && Character.isDigit(file.charAt(j))){
-                    j++;
+                // int j = i+1;
+                // while(j-i+1 <= 5 && j < file.length() && Character.isDigit(file.charAt(j))){
+                //     j++;
+                // }
+                // number = Integer.parseInt(file.substring(i, j));
+                // tail = file.substring(j);
+                // break;
+                
+
+                // file = img123일 때 if문 안 타고 그냥 종료됨.
+                int j=i+1;
+                for(j=i+1; j<file.length(); j++){
+                    if(j-i+1 > 5){
+                        break;
+                    }
+                    
+                    if(!Character.isDigit(file.charAt(j))){
+                        break;
+                    }
                 }
                 number = Integer.parseInt(file.substring(i, j));
                 tail = file.substring(j);
                 break;
-                
-//                 for(int j=i+1; j<file.length(); j++){
-//                     if(j-i+1 > 5 && Character.isDigit(file.charAt(j))){
-//                         number = Integer.parseInt(file.substring(i, j));
-//                         tail = file.substring(j);
-//                         isEnd = true;
-//                         break;
-//                     }
-                    
-//                     if(!Character.isDigit(file.charAt(j))){
-//                         number = Integer.parseInt(file.substring(i, j));
-//                         tail = file.substring(j);
-//                         isEnd = true;
-//                         break;
-//                     }
-//                 }
-                
-                // if(isEnd)
-                //     break;
             }
         }
         return new A(file, head, number, tail, idx);
