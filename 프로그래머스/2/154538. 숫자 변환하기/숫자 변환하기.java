@@ -1,80 +1,54 @@
 import java.util.*;
 
 class Solution {
-    
-    static boolean isOk = false;
-    // static int[] visited;
-    static boolean[] visited;
-    static int answer = -1;
-    
     public int solution(int x, int y, int n) {
-        // visited = new int[1000001];
-        visited = new boolean[1000001];
-        // DFS(x, y, n, 0);
-        // if(isOk)
-            // return visited[y];
-        // return -1;
-        BFS(x,y,n);
-        return answer;
+        return bfs(x, y, n);
     }
     
-    public static void BFS(int x, int y, int n){
-        Queue<Pair> queue = new LinkedList<>();
-        queue.add(new Pair(x, 0));
-                
+    public int bfs(int x, int y, int n){
+        Queue<int[]> queue = new LinkedList<>();
+        Set<Integer> visited = new HashSet<>();
+        
+        queue.add(new int[]{x, 0});
+        visited.add(x);
+        
         while(!queue.isEmpty()){
-            Pair current = queue.poll();
-            int currentValue = current.v;
-            int currentHeight = current.h;
+            int[] cur = queue.poll();
+            int num = cur[0];
+            int height = cur[1];
             
-            if(currentValue == y){
-                answer = currentHeight;
-                return;
+            // 10
+            // 15 20 30
+            // x x x 25 40 60
+            // System.out.println(num);
+            
+            if(num > y){
+                continue;
             }
             
-            if(currentValue > y)
-                continue;
+            if(num == y){
+                return height;
+            }
             
-            if(visited[currentValue])
-                continue;
+            if(!visited.contains(num+n) && num + n <= y) {
+                visited.add(num+n);
+                queue.add(new int[]{num+n,height+1}); 
+            }
             
-            visited[currentValue] = true;
+            if(!visited.contains(num*2) || num * 2 <= y){
+                visited.add(num*2);
+                queue.add(new int[]{num*2,height+1});
+            }
             
-            queue.add(new Pair(currentValue+n, currentHeight+1));
-            queue.add(new Pair(currentValue*2, currentHeight+1));
-            queue.add(new Pair(currentValue*3, currentHeight+1));
+            if(!visited.contains(num*3) || num * 3 <= y){
+                visited.add(num*3);
+                queue.add(new int[]{num*3,height+1});
+            }
+            
+            
         }
+        
+        return -1;
     }
-    
-    static class Pair {
-        int v;
-        int h;
-        
-        public Pair(int v, int h){
-            this.v=v;
-            this.h=h;
-        }
-    }
-    
-//     public static void DFS(int x, int y, int n, int count){
-        
-//         if (x > y) {
-//             return;
-//         }
-        
-//         if (visited[x] > 0 && visited[x] <= count) {
-//             return;
-//         }
-        
-//         visited[x] = count;
-        
-//         if (x == y) {
-//             isOk = true;
-//             return;
-//         }
-        
-//         DFS(x+n, y, n, count+1);
-//         DFS(x*2, y, n, count+1);
-//         DFS(x*3, y, n, count+1);
-//     }
+
 }
