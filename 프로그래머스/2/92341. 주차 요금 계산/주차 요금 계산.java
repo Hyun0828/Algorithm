@@ -1,77 +1,65 @@
 import java.util.*;
 
 class Solution {
-    public int[] solution(int[] fees, String[] records) {        
-        int defaultTime = fees[0];
-        int defaultPay = fees[1];
-        int unitTime = fees[2];
-        int unitPay = fees[3];
+    public int[] solution(int[] fees, String[] records) {
         
-        // 차량번호 : 입/출 + 시각
-        Map<Integer, InOut> map = new HashMap<>();
-        // 차량번호 : 주차 시간
-        Map<Integer, Integer> tmap = new TreeMap<>();
-        // 차량번호 기억하기
-        Set<Integer> set = new TreeSet<>();
+        // 차량번호 : 입차시각
+        Map<Integer, Integer> parking = new HashMap<>();
+        // 차량번호 : 총 주차시간
+        Map<Integer, Integer> map = new HashMap<>();
         
-        // 주차 시간 구하기
-        for(int i=0; i<records.length; i++){
-            String record = records[i];
-            String[] temp = record.split(" ");
-            
-            int time = convert(temp[0]);
-            int carNum = Integer.parseInt(temp[1]);
-            String inout = temp[2];
-            
-            if (map.containsKey(carNum)) {
-                int ptime = map.get(carNum).time;
-                String pinout = map.get(carNum).inout;
-                int timeSlice = time - ptime;
-                
-                tmap.put(carNum, tmap.getOrDefault(carNum, 0) + timeSlice);
-                map.remove(carNum);
+        for(String record : records){
+            String[] tmp = record.split(" ");
+            int time = convertTime(tmp[0]);
+            int carNumber = Integer.parseInt(tmp[1]);
+            if(tmp[2].equals("IN")){
+                parking.put(carNumber, time);
             } else {
-                map.put(carNum, new InOut(time, inout));
+                int enterTime = parking.get(carNumber);            
+                map.put(carNumber, map.getOrDefault(carNumber, 0) + time - enterTime);
+                parking.remove(carNumber);
             }
-            set.add(carNum);
         }
         
-        // 안 빠져나온 차가 있으면 23:59에 출차 처리
-        for (int carNum : map.keySet()) {
-            int inTime = map.get(carNum).time;
-            int timeSlice = convert("23:59") - inTime;
-            tmap.put(carNum, tmap.getOrDefault(carNum, 0) + timeSlice);
+        // 출차 기록이 없는 차량 -> 23:59 출차로 판단
+        for(Integer carNumber : parking.keySet()){
+            int startTime = parking.get(carNumber);
+            int endTime = convertTime("23:59");
+            map.put(carNumber, map.getOrDefault(carNumber, 0) + endTime - startTime);
         }
         
-        int[] answer = new int[set.size()];
+        Map<Integer, Integer> result = new TreeMap<>();
+        for(Integer carNumber : map.keySet()){
+            result.put(carNumber, calculate(fees, map.get(carNumber)));
+        }
+        int[] answer = new int[result.size()];
         int idx = 0;
-        // 누적 주차 시간에 대한 주차 요금 계산
-        for (int carNum : tmap.keySet()) {
-            int totalTime = tmap.get(carNum);
-            if(totalTime > defaultTime){
-                double n = (double)(totalTime - defaultTime) / unitTime;
-                int totalPay = (int) (Math.ceil(n) * unitPay);
-                answer[idx++] = defaultPay + totalPay;
-            } else {
-                answer[idx++] = defaultPay;
-            }
+        for(Integer k : result.keySet()){
+            answer[idx++] = result.get(k);
         }
         
         return answer;
     }
     
-    public static int convert(String hhmm){
-        String[] s = hhmm.split(":");
-        return Integer.parseInt(s[0]) * 60 + Integer.parseInt(s[1]);
+    public int convertTime(String t){
+        String[] tmp = t.split(":");      
+        return Integer.parseInt(tmp[0]) * 60 + Integer.parseInt(tmp[1]);
     }
     
-    public static class InOut {
-        int time;
-        String inout;
+    public int calculate(int[] fees, int time){
+        int money = 0;
         
-        public InOut(int time, String inout){
-            this.time = time;
-            this.inout = inout;
-        }
+        int defaultTime = fees[0];
+        int defaultFee = fees[1];
+        int unitTime = fees[2];
+        int unitFee = fees[3];
+        
+        if(time <= defaultTime)
+            return defaultFee;
+        time -= defaultTime;
+        money += defaultFee;
+        money += (int) (Math.ceil(time / (double)unitTime) * unitFee);
+        
+        return money;
     }
 }
