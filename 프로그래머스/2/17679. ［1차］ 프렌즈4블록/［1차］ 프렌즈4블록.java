@@ -1,81 +1,70 @@
 import java.util.*;
 
 class Solution {
+    
+    char[][] map;
+    int answer = 0;
+    
     public int solution(int m, int n, String[] board) {
-        int answer = 0;
-        
-        char[][] map = new char[m][n];
+        map = new char[m][n];
         for(int i=0; i<board.length; i++){
             map[i] = board[i].toCharArray();
         }
         
-        while(true){
-            // 찾고
-            Set<String> points = search(m, n, map);
-            if(points.isEmpty()){
-                break;
-            }
-            answer += points.size();
-            
-            // 없애고
-            delete(points, m, n, map);
-
-            // 내리고
-            down(m, n, map);
+        while(erase(m, n)){
+            down(m, n);
         }
+        
         return answer;
     }
     
-    public static Set<String> search(int m, int n, char[][] map){
-        Set<String> points = new HashSet<>();
+    public boolean erase(int m, int n){
+        Set<String> set = new HashSet<>();
         for(int i=0; i<m-1; i++){
             for(int j=0; j<n-1; j++){
                 char c = map[i][j];
-                if(c == '0')
+                if(c == 'z')
                     continue;
                 if(map[i+1][j] == c && map[i][j+1] == c && map[i+1][j+1] == c){
-                    points.add(i + "," + j);
-                    points.add((i+1) + "," + j);
-                    points.add(i +"," +(j+1));
-                    points.add((i+1)+","+(j+1));
+                    String s = i + "," + j;
+                    String s1 = (i+1) + "," + j;
+                    String s2 = i + "," + (j+1);
+                    String s3 = (i+1) + "," + (j+1);
+                    set.add(s);
+                    set.add(s1);
+                    set.add(s2);
+                    set.add(s3);
                 }
             }
         }
         
-        return points;
-    }
-    
-    public static void delete(Set<String> points, int m, int n, char[][] map){
-        for(String p : points){
-            int x = Integer.parseInt(p.split(",")[1]);
-            int y = Integer.parseInt(p.split(",")[0]);
-            map[y][x] = '0';
+        if(set.isEmpty())
+            return false;
+        
+        for(String s : set){
+            String[] t = s.split(",");
+            int y = Integer.parseInt(t[0]);
+            int x = Integer.parseInt(t[1]);
+            map[y][x] = 'z';
+            answer++;
         }
+        return true;
     }
     
-    public static void down(int m, int n, char[][] map){
-        for (int i=m-1; i>0; i--) {
-            for(int j=0; j<n; j++){
-                if(map[i][j] == '0'){
-                    int k = i - 1;
-                    while(k >= 0 && map[k][j] == '0')
-                        k--;
-                    if(k >= 0){
-                        map[i][j] = map[k][j];
-                        map[k][j] = '0';
+    public void down(int m, int n){
+        for(int i=0; i<n; i++){
+            for(int j=m-1; j>=0; j--){
+                if(map[j][i] != 'z'){
+                    for(int k=j+1; k<m; k++){
+                        if(map[k][i] == 'z'){
+                            map[k][i] = map[k-1][i];
+                            map[k-1][i] = 'z';
+                        } else {
+                            break;
+                        }
                     }
                 }
             }
-        }
-    }
-    
-    static class Point {
-        int y;
-        int x;
-        
-        public Point(int y, int x){
-            this.x=x;
-            this.y=y;
         }
     }
 }
