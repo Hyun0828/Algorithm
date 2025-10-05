@@ -2,32 +2,42 @@ import java.util.*;
 
 class Solution {
     public String[] solution(String[] record) {
-        List<String> answer = new ArrayList<>();
+        // userId - Name
+        Map<String, String> userMap = new HashMap<>();
+        List<History> list = new ArrayList<>();
         
-        Map<String, String> nameMap = new HashMap<>();
-        
-        for(int i=0; i<record.length; i++){
-            String[] s = record[i].split(" ");
-            if(s[0].equals("Enter"))
-                nameMap.put(s[1], s[2]);
-            if(s[0].equals("Change"))
-                nameMap.put(s[1], s[2]);
+        for(String s : record){
+            String[] t = s.split(" ");
+            if(t[0].equals("Enter")){
+                userMap.put(t[1], t[2]);
+                list.add(new History(true, t[1]));
+            } else if(t[0].equals("Leave")){
+                list.add(new History(false, t[1]));
+            } else if(t[0].equals("Change")){
+                userMap.put(t[1], t[2]);
+            }
         }
         
-        for(int i=0; i<record.length; i++){
-            String[] s = record[i].split(" ");
-            if(s[0].equals("Enter"))
-                answer.add(nameMap.get(s[1]) + "님이 들어왔습니다.");
-            else if(s[0].equals("Leave"))
-                answer.add(nameMap.get(s[1]) + "님이 나갔습니다.");
-            else
-                continue;
+        String[] answer = new String[list.size()];
+        for(int i=0; i<answer.length; i++){
+            String name = userMap.get(list.get(i).userId);
+            if(list.get(i).isEnter){
+                answer[i] = name + "님이 들어왔습니다.";
+            } else {
+                answer[i] = name + "님이 나갔습니다.";
+            }
         }
         
-        String[] temp = new String[answer.size()];
-        for(int i=0; i<answer.size(); i++){
-            temp[i] = answer.get(i);
+        return answer;
+    }
+    
+    public static class History {
+        boolean isEnter;
+        String userId;
+        
+        public History(boolean isEnter, String userId){
+            this.isEnter = isEnter;
+            this.userId = userId;
         }
-        return temp;
     }
 }
