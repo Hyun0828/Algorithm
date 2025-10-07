@@ -1,40 +1,38 @@
 import java.util.*;
 
 class Solution {
-    
-    int answer = 0;
     Set<Integer> set = new HashSet<>();
-    
-    public int solution(String numbers) {
-        permutation(numbers.toCharArray(), new boolean[numbers.length()], "");
-        return answer;
+    Set<Integer> visited = new HashSet<>();
+        
+    public int solution(String numbers) {        
+        char[] arr = numbers.toCharArray();
+        permutation(arr, "");
+        return set.size();
     }
     
-    public void permutation(char[] numbers, boolean[] visited, String number){
-        if(!number.equals("") && isPrime(Integer.parseInt(number)) && !set.contains(Integer.parseInt(number))){
-            answer++;
-            set.add(Integer.parseInt(number));
+    public void permutation(char[] arr, String s){
+
+        if(!s.equals("") && isPrime(Integer.parseInt(s))){
+            set.add(Integer.parseInt(s));
         }
         
-        if(number.length() == numbers.length){
+        if(s.length() == arr.length)
             return;
-        }
         
-        for(int i=0; i<numbers.length; i++){
-            if(visited[i])
+        for(int i=0; i<arr.length; i++){
+            if(visited.contains(i))
                 continue;
-            visited[i] = true;
-            permutation(numbers, visited, number+numbers[i]);
-            visited[i] = false;
+            visited.add(i);
+            permutation(arr, s + arr[i]);
+            visited.remove(i);
         }
     }
     
     public boolean isPrime(int n){
         if(n <= 1)
             return false;
-        
         for(int i=2; i<=Math.sqrt(n); i++){
-            if(n%i == 0)
+            if(n%i==0)
                 return false;
         }
         return true;
