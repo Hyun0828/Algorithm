@@ -1,46 +1,35 @@
 import java.util.*;
 
 class Solution {
-    
-    static int n;
-    static int[] answer;
-    
     public int[] solution(int[][] arr) {
-        int size = arr.length;
-        n = arr.length;
-        answer = new int[2];
-        
-        solve(arr, 0, 0, size);
-        
+        int[] answer = new int[2];
+        int len = arr.length;
+        solve(answer, arr, len, 0, 0);
         return answer;
     }
     
-    public static void solve(int[][] arr, int y, int x, int size){
-        if(y < 0 || y > n || x < 0 || x > n){
-            return;
-        }
-        
-        // 같으면 개수 세기
-        if(find(arr,y,x,size)) {
-            answer[arr[y][x]] += 1;
-            return;
-        }
-        
-        solve(arr, y, x, size / 2);
-        solve(arr, y + size / 2, x, size / 2);
-        solve(arr, y, x + size / 2, size / 2);
-        solve(arr, y + size / 2, x + size / 2, size / 2);
-    }
-    
-    public static boolean find(int[][] arr, int y, int x, int size){
-        int num = arr[y][x];
-        for(int i=y; i<y+size; i++){
-            for(int j=x; j<x+size; j++){
-                if(num != arr[i][j]){
-                    return false;
+    public void solve(int[] answer, int[][] arr, int len, int y, int x){
+        int n = arr[y][x];
+        boolean isSame = true;
+        for(int i=y; i<y+len; i++){
+            for(int j=x; j<x+len; j++){
+                if(n != arr[i][j]){
+                    isSame = false;
+                    break;
                 }
             }
+            if(!isSame)
+                break;
         }
-        return true;
+        
+        if(isSame){
+            answer[n]++;
+            return;
+        }
+        
+        solve(answer, arr, len/2, y, x);
+        solve(answer, arr, len/2, y+len/2, x);
+        solve(answer, arr, len/2, y, x+len/2);
+        solve(answer, arr, len/2, y+len/2, x+len/2);
     }
 }
