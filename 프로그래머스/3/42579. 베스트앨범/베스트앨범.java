@@ -3,81 +3,71 @@ import java.util.*;
 class Solution {
     public int[] solution(String[] genres, int[] plays) {
         
-        // 장르별 재생 횟수
-        Map<String, Integer> genreCountMap = new HashMap<>();
-        
-        // 해당 장르에서 재생 횟수
-        Map<String, Map<Integer, Integer>> playCountMap = new HashMap<>();
+        // 장르별 재생횟수
+        Map<String, Integer> gMap = new HashMap<>();
+        // 장르 내에서 노래별 재생 횟수
+        Map<String, PriorityQueue<Song>> sMap = new HashMap<>();
         
         for(int i=0; i<genres.length; i++){
             String genre = genres[i];
             int play = plays[i];
             
-            genreCountMap.put(genre, genreCountMap.getOrDefault(genre, 0) + play);
-            playCountMap.putIfAbsent(genre, new HashMap<>());
-            Map<Integer, Integer> map = playCountMap.get(genre);
-            map.put(i, map.getOrDefault(i, 0) + play);
+            gMap.put(genre, gMap.getOrDefault(genre, 0) + play);
+            sMap.putIfAbsent(genre, new PriorityQueue<Song>());
+            PriorityQueue<Song> pq = sMap.get(genre);
+            pq.add(new Song(play, i));
         }
         
-        // 장르별 재생 순서 
-        PriorityQueue<A> pq = new PriorityQueue<>();
-        for(String key : genreCountMap.keySet()){
-            pq.add(new A(key, genreCountMap.get(key)));
+        PriorityQueue<Genre> gpq = new PriorityQueue<>();
+        for(String s : gMap.keySet()){
+            gpq.add(new Genre(s, gMap.get(s)));
         }
         
-        List<Integer> answer = new ArrayList<>();
-        int index = 0;
-        
-        while(!pq.isEmpty()){
-            PriorityQueue<B> q = new PriorityQueue<>();
-            A a = pq.poll();
-            Map<Integer, Integer> map = playCountMap.get(a.genre);
-            
-            for(Integer i : map.keySet()){
-                q.add(new B(i, map.get(i)));
+        List<Integer> result = new ArrayList<>();
+        int idx = 0;
+        while(!gpq.isEmpty()){
+            String genre = gpq.poll().genre;
+            PriorityQueue<Song> spq = sMap.get(genre);
+            int count = 0;
+            while(count < 2 && !spq.isEmpty()){
+                result.add(spq.poll().idx);
+                count++;
             }
-            
-            answer.add(q.poll().num);
-            if(!q.isEmpty())
-                answer.add(q.poll().num);
         }
         
-        int[] result = new int[answer.size()];
-        for(int i=0; i<result.length; i++){
-            result[i] = answer.get(i);
-        }
-        
-        return result;
-        
+        int[] answer = new int[result.size()];
+        for(int i=0; i<answer.length; i++)
+            answer[i] = result.get(i);
+        return answer;
     }
     
-    public static class A implements Comparable<A> {
+    public static class Genre implements Comparable<Genre> {
         String genre;
         int play;
         
-        public A(String genre, int play){
+        public Genre(String genre, int play){
             this.genre = genre;
             this.play = play;
         }
         
         @Override
-        public int compareTo(A a){
-            return a.play - this.play;
+        public int compareTo(Genre g){
+            return g.play - this.play;
         }
     }
     
-    public static class B implements Comparable<B>{
-        int num;
+    public static class Song implements Comparable<Song> {
         int play;
+        int idx;
         
-        public B(int num, int play){
-            this.num = num;
+        public Song(int play, int idx){
             this.play = play;
+            this.idx = idx;
         }
         
         @Override
-        public int compareTo(B b){
-            return b.play - this.play;
+        public int compareTo(Song s){
+            return s.play - this.play;
         }
     }
 }
