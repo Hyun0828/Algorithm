@@ -2,50 +2,42 @@ import java.util.*;
 
 class Solution {
     public int solution(int bridge_length, int weight, int[] truck_weights) {
-        int answer = 0;
-        int idx = 0;
-        int current_weight = 0;
-        int current_time = 1;
-        Queue<Truck> bridge = new LinkedList<>();
+        Queue<Truck> bridge = new LinkedList<>(); // 다리
+        int currentWeight = 0; // 다리 위에 올라간 트럭 무게 합
+        int currentTime = 1; // 현재 시각
+        int i = 0;
         
-        while(true){            
-            // 다리에서 맨 앞에 있는 트럭이 다리에서 나올 수 있으면
+        while(true){
             if(!bridge.isEmpty()){
-                Truck firstTruck = bridge.peek();
-                if(current_time - firstTruck.enterTime >= bridge_length){
-                    bridge.poll();
-                    current_weight -= firstTruck.weight;
+                if(currentTime - bridge.peek().enterTime == bridge_length){
+                    Truck t = bridge.poll();
+                    currentWeight -= t.weight;
                 }
             }
             
-            if(idx == truck_weights.length && bridge.isEmpty()){
+            if(bridge.isEmpty() && i == truck_weights.length) {
                 break;
             }
             
-            // 트럭이 다리 위로 올라갈 수 있으면
-            if(idx < truck_weights.length){
-               if(bridge.size() + 1 <= bridge_length && current_weight + truck_weights[idx] <= weight){
-                    bridge.add(new Truck(truck_weights[idx], current_time));
-                    current_weight += truck_weights[idx];
-                    idx++;
-                } 
+            if(i < truck_weights.length && bridge.size() + 1 <= bridge_length && currentWeight + truck_weights[i] <= weight){
+                bridge.add(new Truck(currentTime, truck_weights[i]));
+                currentWeight += truck_weights[i];   
+                i++;
             }
             
-            current_time++;
+            currentTime++;
         }
-        // 1 3 4 6 
         
-        
-        return current_time;
+        return currentTime;
     }
     
     public static class Truck {
-        int weight;
         int enterTime;
+        int weight;
         
-        public Truck(int weight, int enterTime){
-            this.weight = weight;
+        public Truck(int enterTime, int weight){
             this.enterTime = enterTime;
+            this.weight = weight;
         }
     }
 }
