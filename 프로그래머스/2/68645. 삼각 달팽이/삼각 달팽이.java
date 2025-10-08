@@ -2,61 +2,73 @@ import java.util.*;
 
 class Solution {
     
-    int[][] map;
-    boolean[][] visited;
-    
     public int[] solution(int n) {
-        int[] answer = new int[n * (n + 1) / 2];
-        
-        map = new int[n][n];
-        visited = new boolean[n][n];
-        
-        int count = 0;
+        int end = 0;
+        for(int i=1; i<=n; i++)
+            end += i;
+        /*
+            1
+            2 12
+            3 13 11
+            4 14 15 10
+            5  6  7  8  9
+        */
+        int[][] arr = new int[n][n];
         int y = 0;
         int x = 0;
-        int direction = -1; // -1(아래), 0(오른쪽), 1(왼쪽 위)
+        int num = 1;
+        int dir = 1; // 아래 : 1, 오른쪽 : 2, 왼쪽 위 : 3
         
-        while (true) {
-            if (count == n * (n + 1) / 2) {
+        while(true){
+            if(dir == 1){
+                arr[y][x] = num;
+                y++;
+                num++;
+                
+                if(y < 0 || y >= n || arr[y][x] != 0){
+                    y--;
+                    x++;
+                    dir = 2;
+                }
+            } else if(dir == 2){
+                arr[y][x] = num;
+                x++;
+                num++;
+                
+                if(x < 0 || x >= n || arr[y][x] != 0){
+                    x--;
+                    y--;
+                    x--;
+                    dir = 3;
+                }
+            } else if(dir == 3){
+                arr[y][x] = num;
+                y--;
+                x--;
+                num++;
+                
+                if(y < 0 || y >= n || x < 0 || x >= n || arr[y][x] != 0){
+                    y++;
+                    x++;
+                    y++;
+                    dir = 1;
+                }
+            }
+            
+            if(num > end)
                 break;
-            }
-            map[y][x] = ++count;
-            visited[y][x] = true;
-
-            if (direction == -1) {
-                if (y + 1 == n || visited[y + 1][x]) {
-                    direction = 0;
-                    x++;
-                } else {
-                    y++;
-                }
-            } else if (direction == 0) {
-                if (x + 1 == n || visited[y][x + 1]) {
-                    direction = 1;
-                    y--;
-                    x--;
-                } else {
-                    x++;
-                }
-            } else if (direction == 1) {
-                if (visited[y - 1][x - 1]) {
-                    direction = -1;
-                    y++;
-                } else {
-                    y--;
-                    x--;
-                }
-            }
-        }
-
-        int idx = 0;
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                if (map[i][j] != 0)
-                    answer[idx++] = map[i][j];
-            }
         }
         
+        
+        int[] answer = new int[num-1];
+        int idx = 0;
+        for(int i=0; i<n; i++){
+            for(int j=0; j<=i; j++){
+                answer[idx++] = arr[i][j];
+            }
+            System.out.println();
+        }
         return answer;
     }
+    
 }
