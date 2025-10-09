@@ -2,82 +2,73 @@ import java.util.*;
 
 class Solution {
     
-    int[] rank;
     int[] parent;
+    int[] rank;
     
     public int solution(int n, int[][] wires) {
-        int answer = 100000000;
+        int answer = 1000000000;
         
         for(int i=0; i<wires.length; i++){
-            rank = new int[n+1];
-            parent = new int[n+1];
-            for(int j=1; j<=n; j++){
-                rank[j] = 0;
-                parent[j] = j;
-            }
-        
+            init(n);
             for(int j=0; j<wires.length; j++){
-                if(i==j)
+                if(i == j)
                     continue;
-                
-                int x = wires[j][0];
-                int y = wires[j][1];
-                
-                union(x, y);
+                int a = wires[j][0];
+                int b = wires[j][1];
+                union(a, b);
             }
             
             Map<Integer, Integer> map = new HashMap<>();
-            for(int j=1; j<=n; j++){
-                int root = find(j);
+            Set<Integer> set = new HashSet<>();
+            for(int z=1; z<=n; z++){
+                int root = find(z);
+                set.add(root);
                 map.put(root, map.getOrDefault(root, 0) + 1);
             }
-            
-            if(map.size() != 2){
+            if(map.size() < 2)
                 continue;
+            
+            int[] tmp = new int[2];
+            int idx = 0;
+            for(Integer k : set){
+                tmp[idx++] = map.get(k);
             }
             
-            List<Integer> keys = new ArrayList<>();
-            for(Integer k : map.keySet()){
-                keys.add(k);
-            }
-            
-            int v1 = 0;
-            int v2 = 0;
-            for(int j=0; j<2; j++){
-                if(j==0)
-                    v1 = map.get(keys.get(j));
-                else if(j==1)
-                    v2 = map.get(keys.get(j));
-            }
-            
-            answer = (int)Math.min(answer, Math.abs(v1-v2));
+            answer = Math.min(answer, Math.abs(tmp[0] - tmp[1]));
         }
         
         return answer;
     }
     
-    public int find(int x){
-        if(x==parent[x]){
-            return x;
+    public void init(int n){
+        parent = new int[n+1];
+        rank = new int[n+1];
+        
+        for(int i=1; i<=n; i++){
+            parent[i] = i;
+            rank[i] = 0;
         }
+    }
+    
+    public int find(int x){
+        if(x == parent[x])
+            return parent[x];
         return parent[x] = find(parent[x]);
     }
     
     public void union(int a, int b){
-        int A = find(a);
-        int B = find(b);
+        int pa = find(a);
+        int pb = find(b);
         
-        if(A == B){
+        if(pa == pb)
             return;
-        }
         
-        if(rank[A] > rank[B]){
-            parent[B] = A;
+        if(rank[pa] > rank[pb]){
+            parent[pb] = parent[pa];
         } else {
-            parent[A] = B;
-            if(rank[A] == rank[B]){
-                rank[B]++;
-            }
+            parent[pa] = parent[pb];
+            if(rank[pa] == rank[pb])
+                rank[pb]++;
         }
     }
 }
