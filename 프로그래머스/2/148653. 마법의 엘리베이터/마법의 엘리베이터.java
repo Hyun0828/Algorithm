@@ -1,34 +1,36 @@
+import java.util.*;
+
 class Solution {
     public int solution(int storey) {
-        int count = 0;
+        int answer = 0;
         
-        while (storey > 0) {
-            int n = storey % 10;
-            storey /= 10;
+        while(storey != 0){
+            int r = storey % 10;
+            System.out.println(storey + ", " + answer);
             
-            if(n < 5) {
-                count += n;
-                continue;
-            }
-            
-            if(n == 5){
-                int m = storey % 10;
-                if(m + 1 > 5){
-                    storey += 1;
-                    count += (10 - n);
-                    continue;
+            // 만약 r이 5라면, 그 윗자리수를 봐야한다.
+            if(r == 5){
+                int q = (storey / 10) % 10;
+                if(q < 5) {
+                    storey -= r;
+                    answer += r;
+                } else if(q > 5){
+                    storey += r;
+                    answer += r;
                 } else {
-                    count += n;
-                    continue;
+                    storey += r;
+                    answer += r;
                 }
+            } else if(r < 5){
+                storey -= r;
+                answer += r;
+            } else {
+                storey += (10 - r);
+                answer += (10 - r);
             }
-            
-            if(n > 5){
-                storey += 1;
-                count += (10-n);
-            }
+            storey /= 10;
         }
-        
-        return count;
+
+        return answer;
     }
 }
