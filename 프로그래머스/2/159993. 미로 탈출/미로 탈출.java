@@ -1,100 +1,75 @@
 import java.util.*;
 
 class Solution {
-    
-    static int[][] map;
-    static int y;
-    static int x;
-    static Point start;
-    static Point exit;
-    static Point lev;
-    
-    static int[] dx = {-1, 1, 0, 0};
-    static int[] dy = {0, 0, 1, -1};
-    
-    public int solution(String[] maps) {
-        y = maps.length;
-        x = maps[0].length();
-            
-        init(maps);
-        int dist1 = BFS(start, lev);
-        if(dist1 == -1) return -1;
-
-        init(maps);
-        int dist2 = BFS(lev, exit);
-        if(dist2 == -1) return -1;
-
-        return dist1 + dist2;
-    }
-    
-    public static void init(String[] maps){
-        map = new int[y][x];
-        for(int i=0; i<y; i++){
-            char[] arr = maps[i].toCharArray();
-            for(int j=0; j<x; j++){
-                if(arr[j] == 'S'){
-                    map[i][j] = 0;
-                    start = new Point(i, j);
-                } else if (arr[j] == 'X'){
-                    map[i][j] = -1;
-                } else if (arr[j] == 'O'){
-                    map[i][j] = 0;
-                } else if (arr[j] == 'E'){
-                    map[i][j] = 0;
-                    exit = new Point(i, j);
-                } else if (arr[j] == 'L'){
-                    map[i][j] = 0;
-                    lev = new Point(i, j);
+    public int solution(String[] maps) {        
+        int Y = maps.length;
+        int X = maps[0].length();
+        
+        int sy = 0;
+        int sx = 0;
+        int ly = 0;
+        int lx = 0;
+        int ey = 0;
+        int ex = 0;
+        
+        char[][] map = new char[Y][X];
+        for(int i=0; i<Y; i++){
+            map[i] = maps[i].toCharArray();
+            for(int j=0; j<X; j++){
+                if(map[i][j] == 'S'){
+                    sy = i;
+                    sx = j;
+                } else if(map[i][j] == 'L'){
+                    ly = i;
+                    lx = j;
+                } else if(map[i][j] == 'E'){
+                    ey = i;
+                    ex = j;
                 }
             }
         }
+        
+        int l1 = bfs(map, Y, X, sy, sx, ly, lx);
+        if(l1 == -1)
+            return -1;
+        int l2 = bfs(map, Y, X, ly, lx, ey, ex);
+        if(l2 == -1)
+            return -1;
+        return l1 + l2;
     }
     
-    public static int BFS(Point s, Point e){
-        Queue<Point> queue = new LinkedList<>();
-        boolean[][] visited = new boolean[y][x];
+    public int bfs(char[][] map, int Y, int X, int sy, int sx, int ey, int ex){
+        Queue<int[]> queue = new LinkedList<>(); // y, x, len
+        Set<String> visited = new HashSet<>();
+        int[] dx = {-1, 1, 0, 0};
+        int[] dy = {0, 0, -1, 1};
         
-        queue.add(s);
-        visited[s.y][s.x] = true;
+        queue.add(new int[]{sy, sx, 0});
+        visited.add(sy + "," + sx);
         
         while(!queue.isEmpty()){
-            Point current = queue.poll();
-            int cy = current.y;
-            int cx = current.x;
-            int value = map[cy][cx];
+            int[] cur = queue.poll();
+            int cy = cur[0];
+            int cx = cur[1];
+            int cLen = cur[2];
             
-            if(cy == e.y && cx == e.x){
-                return map[cy][cx];
+            if(cy == ey && cx == ex){
+                return cLen;
             }
             
             for(int i=0; i<4; i++){
                 int ny = cy + dy[i];
                 int nx = cx + dx[i];
+                int nLen = cLen + 1;
                 
-                if(ny < 0 || ny >= y || nx < 0 || nx >= x)
-                    continue;
-                if(visited[ny][nx])
-                    continue;
-                if(map[ny][nx] == -1)
+                if(ny < 0 || ny >= Y || nx < 0 || nx >= X || map[ny][nx] == 'X' || visited.contains(ny + "," + nx))
                     continue;
                 
-                visited[ny][nx] = true;
-                queue.add(new Point(ny, nx));
-                map[ny][nx] = value + 1;
+                visited.add(ny + "," + nx);
+                queue.add(new int[]{ny, nx, nLen});
             }
         }
         
-        // 실패
         return -1;
-    }
-    
-    static class Point {
-        int y;
-        int x;
-        
-        public Point(int y, int x){
-            this.y=y;
-            this.x=x;
-        }
     }
 }
