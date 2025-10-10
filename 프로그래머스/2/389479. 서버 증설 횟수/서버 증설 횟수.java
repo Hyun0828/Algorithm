@@ -4,27 +4,28 @@ class Solution {
     public int solution(int[] players, int m, int k) {
         int answer = 0;
         
+        // 증설된 서버 관리 (증설된 서버의 종료 시각을 큐에 순서대로 넣는다)
         Queue<Integer> queue = new LinkedList<>();
         
         for(int i=0; i<players.length; i++){
-            int player = players[i];
-            int time = i;
-            int needServer = player / m; 
-            
-            while(!queue.isEmpty() && queue.peek() <= time){
+            while(!queue.isEmpty() && queue.peek() == i){
                 queue.poll();
             }
-            
-            int nowServer = queue.size();
-            if(nowServer >= needServer)
+            int player = players[i];
+            int n = queue.size();
+
+            // 어느 시간대의 이용자가 m명 미만이라면, 서버 증설이 필요하지 않다.
+            if(player < m){
                 continue;
+            }
             
-            for(int j=0; j<needServer - nowServer; j++){
+            // target대의 서버가 필요한 상황에서,
+            int target = player / m;
+            for(int j=n; j<target; j++){
                 answer++;
-                queue.add(time+k);
+                queue.add(i + k);
             }
         }
-        
         
         return answer;
     }
