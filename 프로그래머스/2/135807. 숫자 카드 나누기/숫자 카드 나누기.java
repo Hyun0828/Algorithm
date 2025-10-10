@@ -2,50 +2,45 @@ import java.util.*;
 
 class Solution {
     public int solution(int[] arrayA, int[] arrayB) {
-        int answer = 0;
-                
-        // 최대공약수로 나눌 수 있는 숫자가 있으면, 최대공약수의 약수로는 반드시 나눌 수 있다.
-        // 그래서 최대공약수가 안 되면 걍 안 되는거네
-        
-        int resultA = arrayA[0];
-        int resultB = arrayB[0];
+        int gcdA = arrayA[0];
+        int gcdB = arrayB[0];
         
         for(int i=1; i<arrayA.length; i++){
-            resultA = gcd(resultA, arrayA[i]);
-            resultB = gcd(resultB, arrayB[i]);
+            gcdA = gcd(gcdA, arrayA[i]);
+        }
+        for(int i=1; i<arrayB.length; i++){
+            gcdB = gcd(gcdB, arrayB[i]);
         }
         
-        boolean a = true;
-        boolean b = true;
-        
+        boolean aPossible = true;
+        boolean bPossible = true;
         for(int i=0; i<arrayA.length; i++){
-            if(arrayA[i] % resultB == 0){
-                a = false;
+            if(arrayA[i] % gcdB == 0){
+                bPossible = false;
                 break;
             }
         }
-        for(int i=0; i<arrayA.length; i++){
-            if(arrayB[i] % resultA == 0){
-                b = false;
+        for(int i=0; i<arrayB.length; i++){
+            if(arrayB[i] % gcdA == 0){
+                aPossible = false;
                 break;
             }
         }
         
-        if(a && !b)
-            return resultB;
-        if(b && !a)
-            return resultA;
-        if(a && b)
-            return Math.max(resultA, resultB);
-        
+        if(aPossible && bPossible)
+            return Math.max(gcdA, gcdB);
+        if(aPossible)
+            return gcdA;
+        if(bPossible)
+            return gcdB;
         return 0;
     }
     
-    public static int gcd(int a, int b){
+    public int gcd(int a, int b){
         while(b != 0){
-            int t = a % b;
+            int r = a % b;
             a = b;
-            b = t;
+            b = r;
         }
         return a;
     }
