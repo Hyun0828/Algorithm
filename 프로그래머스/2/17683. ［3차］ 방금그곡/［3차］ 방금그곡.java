@@ -1,78 +1,108 @@
 import java.util.*;
 
 class Solution {
-    public String solution(String m, String[] musicinfos) {
-        String answer = "(None)";
-        
-        String cm = convert(m);
-        int resTime = 0;
-        int staTime = 10000000;
-        
-        // System.out.println("cm : " + cm);
-
+    public String solution(String m, String[] musicinfos) {        
+        // 음악들의 풀 악보에 m이 포함되어 있는 지를 확인하는 문제
+        PriorityQueue<Music> pq = new PriorityQueue<>();
         for(int i=0; i<musicinfos.length; i++){
-            String[] s = musicinfos[i].split(",");
-            int playTime = getPlayTime(s[0], s[1]);
-            String name = s[2];
-            String shortMusic = convert(s[3]);
-                        
-            if(playTime < cm.length())
-                continue;
+            String[] tmp = musicinfos[i].split(",");
+            int start = convertTime(tmp[0]);
+            int end = convertTime(tmp[1]);
+            int time = end - start;
+            String title = tmp[2];
+            String music = tmp[3];
             
-            String totalMusic = "";
-            for(int j=0; j<playTime / shortMusic.length(); j++){
-                totalMusic += shortMusic;
-            }
-            int mod = playTime % shortMusic.length();
-            totalMusic += shortMusic.substring(0, mod);
-            
-            // System.out.println(totalMusic);
-            
-            if(totalMusic.contains(cm)){
-                if(resTime <= playTime){
-                    if(resTime == playTime){
-                        if(staTime > Integer.parseInt(s[0].split(":")[0]) * 60){
-                            answer = name;
-                            resTime = playTime;
-                            staTime = Integer.parseInt(s[0].split(":")[0]) * 60;
-                        }
-                    } else {
-                        answer = name;
-                        resTime = playTime;
-                        staTime = Integer.parseInt(s[0].split(":")[0]) * 60;
-                    }
+            List<String> wholeMusic = parseMusic(time, music);
+            boolean isContain = false;
+            int len = parseMusic(m).size();
+            for(int j=0; j<=wholeMusic.size() - len; j++){
+                StringBuilder sb = new StringBuilder();
+                for(int k=0; k<len; k++){
+                    sb.append(wholeMusic.get(j+k));
+                }
+                if(sb.toString().equals(m)){
+                    isContain = true;
+                    break;
                 }
             }
+            if(isContain)
+                pq.add(new Music(time, start, title));
         }
         
-        return answer;
+        if(pq.isEmpty()){
+            return "(None)";
+        }
+        
+        return pq.poll().title;
     }
     
-    public static int getPlayTime(String start, String end){
-        String[] st = start.split(":");
-        int s = Integer.parseInt(st[0]) * 60 + Integer.parseInt(st[1]);
-        String[] et = end.split(":");
-        int e = Integer.parseInt(et[0]) * 60 + Integer.parseInt(et[1]);
-        return e - s;
-    }
-    
-    public static String convert(String s){
-        StringBuilder sb = new StringBuilder();
-        for(int i=0; i<s.length(); i++){
-            char c = s.charAt(i);
-            if(i==s.length()-1){
-                sb.append(c);
-                continue;
-            }
-            char n = s.charAt(i+1);
-            
-            if(n == '#'){
-                sb.append(Character.toLowerCase(c));
+    public List<String> parseMusic(String music){
+        List<String> list = new ArrayList<>();
+        for(int i=0; i<music.length(); i++){
+            if(i < music.length() - 1 && music.charAt(i+1) == '#'){
+                list.add(music.substring(i, i+2));
                 i++;
             } else {
-                sb.append(c);
+                list.add(music.substring(i, i+1));
             }
         }
-        return sb.toString();
+        return list;
+    }
+    
+    public List<String> parseMusic(int time, String music){
+        List<String> result = new ArrayList<>();
+        List<String> list = new ArrayList<>();
+        for(int i=0; i<music.length(); i++){
+            if(i < music.length() - 1 && music.charAt(i+1) == '#'){
+                list.add(music.substring(i, i+2));
+                i++;
+            } else {
+                list.add(music.substring(i, i+1));
+            }
+        }
+        
+        if(list.size() >= time){
+            for(int i=0; i<time; i++){
+                result.add(list.get(i));
+            }
+        } else {
+            int q = time / list.size();
+            int r = time % list.size();
+            for(int i=0; i<q; i++){
+                for(int j=0; j<list.size(); j++){
+                    result.add(list.get(j));
+                }
+            }
+            for(int i=0; i<r; i++){
+                result.add(list.get(i));
+            }
+        }
+        return result;
+    }
+    
+    public int convertTime(String time){
+        String[] tmp = time.split(":");
+        return Integer.parseInt(tmp[0]) * 60 + Integer.parseInt(tmp[1]);
+    }
+    
+    public static class Music implements Comparable<Music>{
+        int length;
+        int start;
+        String title;
+        
+        public Music(int length, int start, String title){
+            this.length=length;
+            this.start=start;
+            this.title=title;
+        }
+        
+        @Override
+        public int compareTo(Music m){
+            if(this.length == m.length){
+                return this.start-m.start;
+            } else{
+                return m.length-this.length;
+            }
+        }
     }
 }
