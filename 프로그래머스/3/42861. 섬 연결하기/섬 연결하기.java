@@ -2,37 +2,37 @@ import java.util.*;
 
 class Solution {
     
-    PriorityQueue<Edge> pq = new PriorityQueue<>();
-    int[] rank;
     int[] parent;
-    Set<Integer> nodes = new HashSet<>();
+    int[] rank;
     
     public int solution(int n, int[][] costs) {
         int answer = 0;
-        rank = new int[n];
+        
         parent = new int[n];
-        
+        rank = new int[n];
         for(int i=0; i<n; i++){
-            rank[i] = 0;
             parent[i] = i;
+            rank[i] = 0;
         }
         
+        List<Edge> edges = new ArrayList<>();
         for(int i=0; i<costs.length; i++){
-            pq.add(new Edge(costs[i][0], costs[i][1], costs[i][2]));
+            int from = costs[i][0];
+            int to = costs[i][1];
+            int weight = costs[i][2];
+            
+            edges.add(new Edge(from, to, weight));
         }
+        Collections.sort(edges);
         
-        while(nodes.size() <= n && !pq.isEmpty()){
-            Edge edge = pq.poll();
+        for(Edge edge : edges){
             int from = edge.from;
             int to = edge.to;
             
-            // cycle 생김
+            // 사이클이 없는지 판단한다.
             if(find(from) == find(to))
                 continue;
-            
             union(from, to);
-            nodes.add(from);
-            nodes.add(to);
             answer += edge.weight;
         }
         
@@ -46,8 +46,8 @@ class Solution {
     }
     
     public void union(int a, int b){
-        int A = parent[a];
-        int B = parent[b];
+        int A = find(a);
+        int B = find(b);
         
         if(A == B)
             return;
@@ -61,7 +61,7 @@ class Solution {
         }
     }
     
-    public static class Edge implements Comparable<Edge> {
+    public static class Edge implements Comparable<Edge>{
         int from;
         int to;
         int weight;
