@@ -1,66 +1,77 @@
 import java.util.*;
 
 class Solution {
-    Map<Integer, List<Integer>> graph;
+    
+    List<Edge>[] graph;
     int[] distance;
+    boolean[] visited;
+    int INF = Integer.MAX_VALUE;
     
     public int solution(int n, int[][] edge) {
-        int answer = 1;
-        
-        graph = new HashMap<>();
+        int answer = 0;
+        graph = new ArrayList[n+1];
+        for(int i=1; i<=n; i++)
+            graph[i] = new ArrayList<>();
         distance = new int[n+1];
+        Arrays.fill(distance, INF);
+        visited = new boolean[n+1];
+        
         for(int i=0; i<edge.length; i++){
             int from = edge[i][0];
             int to = edge[i][1];
             
-            graph.putIfAbsent(from, new ArrayList<>());
-            List<Integer> list = graph.get(from);
-            list.add(to);
-            
-            graph.putIfAbsent(to, new ArrayList<>());
-            List<Integer> tmp = graph.get(to);
-            tmp.add(from);
+            graph[from].add(new Edge(to, 1));
+            graph[to].add(new Edge(from, 1));
         }
+        
         dijkstra(n);
-        Arrays.sort(distance);
-        int max = distance[distance.length-1];
-        for(int i=distance.length-2; i>=0; i--){
-            if(max == distance[i])
+        
+        int max = 0;
+        for(int i=1; i<=n; i++){
+            max = Math.max(max, distance[i]);
+        }
+        for(int i=1; i<=n; i++){
+            if(distance[i] == max){
                 answer++;
-            else
-                break;
+            }
         }
         
         return answer;
     }
     
     public void dijkstra(int n){
-        PriorityQueue<int[]> pq = new PriorityQueue<>((a,b) -> Integer.compare(a[1],b[1]));
-        
-        for(int i=1; i<=n; i++)
-            distance[i] = 100000;
+        PriorityQueue<Edge> pq = new PriorityQueue<>();
         distance[1] = 0;
-        
-        pq.add(new int[]{1, 0});
+        pq.add(new Edge(1, 0));
+        visited[1] = true;
         
         while(!pq.isEmpty()){
-            int[] cur = pq.poll();
-            int node = cur[0];
-            int dis = cur[1];
+            Edge cur = pq.poll();
+            int u = cur.to;
+            int w = cur.weight;
             
-            if(dis > distance[node])
-                continue;
-            
-            if(!graph.containsKey(node))
-                continue;
-            
-            List<Integer> edges = graph.get(node);
-            for(Integer to : edges){
-                if(distance[to] > distance[node] + 1){
-                    distance[to] = distance[node] + 1;
-                    pq.add(new int[]{to, distance[to]});
+            for(Edge e : graph[u]){
+                int v = e.to;
+                if(distance[v] > distance[u] + e.weight){
+                    distance[v] = distance[u] + e.weight;
+                    pq.add(new Edge(v, distance[v]));
                 }
             }
+        }
+    }
+    
+    public static class Edge implements Comparable<Edge> {
+        int to;
+        int weight;
+        
+        public Edge(int to, int weight){
+            this.to = to;
+            this.weight = weight;
+        }
+        
+        @Override
+        public int compareTo(Edge e){
+            return this.weight - e.weight;
         }
     }
 }
