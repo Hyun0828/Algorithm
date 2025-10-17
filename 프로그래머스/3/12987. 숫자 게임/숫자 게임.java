@@ -4,13 +4,9 @@ class Solution {
     public int solution(int[] A, int[] B) {
         int answer = 0;
         
-        // 맞네, 문제에선 순서대로 게임을 한다고 했으나, A의 순서를 고정시킬 필요는 없다.
-        
-        // 1 5 7 7
-        // 2 2 4 8
-        
-        // 7 5 3 1
-        // 8 6 2 2
+        // 1. A팀의 순서가 정해져 있다곤 하지만, 문제를 풀 때 그 순서를 지킬 필요는 없다.
+        // 2. A팀에서 내는 숫자보다 가장 작은 차이로 이겨야겠지
+        // 3. A팀에서 가장 작은 숫자를 내면, B팀에서도 가장 작은 숫자를 내야한다.
         
         PriorityQueue<Integer> pqA = new PriorityQueue<>();
         PriorityQueue<Integer> pqB = new PriorityQueue<>();
@@ -25,7 +21,7 @@ class Solution {
                 pqA.poll();
                 pqB.poll();
                 answer++;
-            } else {
+            } else{
                 pqB.poll();
             }
         }
