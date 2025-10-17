@@ -2,63 +2,57 @@ import java.util.*;
 
 class Solution {
     public int solution(String begin, String target, String[] words) {
-        int answer = 0;
-        
-        Set<String> dict = new HashSet<>();
-        for(int i=0; i<words.length; i++)
-            dict.add(words[i]);
-        
-        // BFS에서 높이
-        if(!dict.contains(target))
-            return 0;
-        return bfs(begin, target, dict);
+        return bfs(begin, target, words);
     }
     
-    
-    public int bfs(String begin, String target, Set<String> dict){
-        Queue<Node> queue = new LinkedList<>();
+    public int bfs(String begin, String target, String[] words){
+        Queue<Word> queue = new LinkedList<>();
         Set<String> visited = new HashSet<>();
-        queue.add(new Node(begin, 0));
+        
+        queue.add(new Word(begin, 0));
         visited.add(begin);
         
         while(!queue.isEmpty()){
-            Node cur = queue.poll();
-            String s = cur.word;
-            int height = cur.height;
+            Word cur = queue.poll();
             
-            if(s.equals(target)){
-                return height;
+            if(cur.word.equals(target)){
+                return cur.height;
             }
             
-            for(String d : dict){
-                if(d.length() != s.length())
-                    continue;
-                
-                int count = 0;
-                for(int i=0; i<s.length(); i++){
-                    char sc = s.charAt(i);
-                    char dc = d.charAt(i);
-                    if(sc != dc){
-                        count++;
-                    }
-                }
-                
-                if(count == 1){
-                    visited.add(d);
-                    queue.add(new Node(d, height+1));
+            for(String word : words){
+                if(!visited.contains(word) && isOk(cur.word, word)){
+                    visited.add(word);
+                    queue.add(new Word(word, cur.height + 1));
                 }
             }
         }
+        
         return 0;
     }
     
-    public static class Node {
+    public boolean isOk(String begin, String word){
+        if(begin.length() != word.length())
+            return false;
+        
+        int count = 0;
+        for(int i=0; i<begin.length(); i++){
+            if(begin.charAt(i) != word.charAt(i))
+                count++;
+            
+            if(count > 1)
+                return false;
+        }
+        
+        return true;
+    }
+    
+    public static class Word {
         String word;
         int height;
         
-        public Node(String word, int height){
+        public Word(String word, int height){
             this.word = word;
-            this.height= height;
+            this.height = height;
         }
     }
 }
