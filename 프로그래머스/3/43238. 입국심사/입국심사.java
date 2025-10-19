@@ -2,26 +2,16 @@ import java.util.*;
 
 class Solution {
     public long solution(int n, int[] times) {
-        return binarySearch(times, n);
-    }
-    
-    public boolean check(int[] times, int n, long ctime) {
         long answer = 0;
-        for(int time : times){
-            answer += ctime / time;
-        }
-        return answer >= n;
-    }
-    
-    public long binarySearch(int[] times, int n) {
-        long answer = 0;
-        long start = 1L;
-        long end = 1_000_000_000L * 1_000_000_000L;
         
+        // 특정 시간 이하면 심사를 받을 수 없고, 특정 시간 이상이면 무조건 심사가 가능하다.
+        // parametric search !
+        
+        long start = 0;
+        long end = 1000000000L * 1000000000L;
         while(start <= end){
             long mid = (start + end) / 2;
-            
-            if(check(times, n, mid)){
+            if(check(n, times, mid)){
                 answer = mid;
                 end = mid - 1;
             } else {
@@ -30,5 +20,15 @@ class Solution {
         }
         
         return answer;
+    }
+    
+    public boolean check(int n, int[] times, long time){
+        long num = 0;
+        for(int i=0; i<times.length; i++){
+            num += time / (long) times[i];
+        }
+        if(num >= n)
+            return true;
+        return false;
     }
 }
