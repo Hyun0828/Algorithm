@@ -3,9 +3,15 @@ import java.util.*;
 class Solution {
     public int solution(int[][] board) {
         int n = board.length;    
-        int[][] map = new int[n][n];
+        int[][][] map = new int[4][n][n]; // 방향별 최솟값을 저장한다.
+        for (int i = 0; i < 4; i++) map[i][0][0] = 0;
         bfs(n, map, board);
-        return map[0][0];
+        int answer = Integer.MAX_VALUE;
+        for (int i = 0; i < 4; i++) {
+            if (map[i][n-1][n-1] != 0)
+                answer = Math.min(answer, map[i][n-1][n-1]);
+        }
+        return answer;
         
         /*
             0 0 0 0 0
@@ -16,11 +22,11 @@ class Solution {
         */
     }
     
-    public void bfs(int n, int[][] map, int[][] board){
+    public void bfs(int n, int[][][] map, int[][] board){
         Queue<int[]> queue = new LinkedList<>();
         int[] dx = {-1,1,0,0};
         int[] dy = {0,0,1,-1};
-        queue.add(new int[]{n-1,n-1,0,4});
+        queue.add(new int[]{0,0,0,4});
         
         while(!queue.isEmpty()){
             int[] cur = queue.poll();
@@ -46,8 +52,8 @@ class Solution {
                 if(board[ny][nx] == 1)
                     continue;
                 
-                if(map[ny][nx] == 0 || map[ny][nx] >= nd){
-                    map[ny][nx] = nd;
+                if(map[i][ny][nx] == 0 || map[i][ny][nx] >= nd){
+                    map[i][ny][nx] = nd;
                     queue.add(new int[]{ny,nx,nd,i});
                 }
             }
