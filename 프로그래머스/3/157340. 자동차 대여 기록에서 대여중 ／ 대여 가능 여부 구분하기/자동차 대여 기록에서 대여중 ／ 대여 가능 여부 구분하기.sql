@@ -1,7 +1,12 @@
-select 
+select
     car_id,
     case
-        when max(case when '2022-10-16' between start_date and end_date then 1 else 0 end) = 1 then '대여중'
+        when sum(
+            case
+                when start_date <= '2022-10-16' and end_date >= '2022-10-16' then 1
+                else 0
+            end
+        ) > 0 then '대여중'
         else '대여 가능'
     end as availability
 from car_rental_company_rental_history
