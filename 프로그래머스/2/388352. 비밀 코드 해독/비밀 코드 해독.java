@@ -1,38 +1,43 @@
 import java.util.*;
 
 class Solution {
-    
-    static int answer;
-    
-    public int solution(int n, int[][] q, int[] ans) {
-        answer = 0;
-        combination(q, ans, n, 1, new HashSet<>());
+    int answer = 0;
+    public int solution(int n, int[][] q, int[] ans) {        
+        List<Set<Integer>> list = new ArrayList<>();
+        for(int i=0; i<q.length; i++){
+            Set<Integer> set = new HashSet<>();
+            for(int j=0; j<q[i].length; j++){
+                set.add(q[i][j]);
+            }
+            list.add(set);
+        }
+        
+        combination(n, list, ans, 1, new HashSet<>());
+        
         return answer;
     }
     
-    public static void combination(int[][] q, int[] ans, int n, int start, Set<Integer> set){
+    public void combination(int n, List<Set<Integer>> list, int[] ans, int start, Set<Integer> set){
         if(set.size() == 5){
-            boolean isOk = true;
-            for(int i=0; i<q.length; i++){
-                int[] num = q[i];
-                int cnt = 0;
-                for(int j=0; j<num.length; j++){
-                    if(set.contains(num[j]))
-                        cnt++;
-                }
-                if(cnt != ans[i]){
-                    isOk = false;
+            // 검사
+            boolean isCorrect = true;
+            for(int i=0; i<list.size(); i++){
+                Set<Integer> temp = new HashSet<>(set);
+                temp.retainAll(list.get(i));
+                if(temp.size() != ans[i]){
+                    isCorrect = false;
                     break;
                 }
             }
-            if(isOk)
+            if(isCorrect){
                 answer++;
+            }
             return;
         }
         
         for(int i=start; i<=n; i++){
             set.add(i);
-            combination(q, ans, n, i+1, set);
+            combination(n, list, ans, i + 1, set);
             set.remove(i);
         }
     }
