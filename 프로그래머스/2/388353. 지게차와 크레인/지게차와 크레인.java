@@ -2,107 +2,98 @@ import java.util.*;
 
 class Solution {
     
-    static int[] dx = {-1, 1, 0, 0};
-    static int[] dy = {0, 0, 1, -1};
+    int[] dx = {-1,1,0,0};
+    int[] dy = {0,0,1,-1};
     
     public int solution(String[] storage, String[] requests) {
-        int Y = storage.length;
-        int X = storage[0].length();
-        char[][] map = new char[Y+2][X+2];
-        int answer = Y * X;
+        int answer = 0;
         
-        for(int i=1; i<=Y; i++){
-            String s = storage[i-1];
-            for(int j=1; j<=X; j++){
-                map[i][j] = s.charAt(j-1);
+        int n = storage.length;
+        int m = storage[0].length();
+        char[][] map = new char[n][m];
+        for(int i=0; i<n; i++){
+            map[i] = storage[i].toCharArray();
+        }
+        
+        for(int i=0; i<requests.length; i++){
+            if(requests[i].length() == 1){
+                // 접근 가능한 컨테이너만 꺼낸다
+                getPossibleContainer(map, n, m, requests[i].charAt(0));
+            } else {
+                // 모든 컨테이너를 꺼낸다
+                getAllContainer(map, n, m, requests[i].charAt(0));
             }
         }
         
-        for(int i=0; i<=X+1; i++){
-            map[0][i] = 'o';   
-            map[Y+1][i] = 'o';
-        }
-        for(int i=0; i<=Y+1; i++){
-            map[i][0] = 'o';   
-            map[i][X+1] = 'o';
-        }
-                   
-        
-        for(int i=0; i<requests.length; i++){
-            if(requests[i].length() == 1)
-                use1(Y, X, map, requests[i].charAt(0));
-            else if(requests[i].length() == 2)
-                use2(Y, X, map, requests[i].charAt(0));
-        }
-        
-        for(int i=1; i<=Y; i++){
-            for(int j=1; j<=X; j++){
-                if(map[i][j] == 'o')
-                    answer--;
+        for(int i=0; i<n; i++){
+            for(int j=0; j<m; j++){
+                if(map[i][j] != 'o')
+                    answer++;
             }
         }
         
         return answer;
     }
     
-    public static void use1(int Y, int X, char[][] map, char target){
-        Queue<Point> queue = new LinkedList<>();
-        boolean[][] visited = new boolean[Y+2][X+2];
-        Queue<Point> q = new LinkedList<>();
+    public boolean dfs(char[][] map, boolean[][] visited, int n, int m, int y, int x){
+        if(y < 0 || x < 0 || y >= n || x >= m)
+            return false;
         
-        queue.add(new Point(0, 0));
+        if(map[y][x] != 'o' || visited[y][x])
+            return false;
         
-        while(!queue.isEmpty()){
-            Point p = queue.poll();
-            
-            if(visited[p.y][p.x])
-                continue;
-            visited[p.y][p.x] = true;
-            
-            for(int i = 0; i < 4; i++){
-                int ny = p.y + dy[i];
-                int nx = p.x + dx[i];
-                
-                if(ny < 0 || ny > Y + 1 || nx < 0 || nx > X + 1)
-                    continue;
-                
-                if(visited[ny][nx])
-                    continue;
-                
-                if(map[ny][nx] == target){
-                    q.add(new Point(ny, nx));
+        visited[y][x] = true;
+        
+        if(y == 0 || x == 0 || y == n - 1 || x == m - 1)
+            return true;
+        
+        for(int i=0; i<4; i++){
+            if(dfs(map, visited, n, m, y + dy[i], x + dx[i])){
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public void getPossibleContainer(char[][] map, int n, int m, char target){
+        Set<int[]> set = new HashSet<>();
+        
+        for(int i=0; i<n; i++){
+            for(int j=0; j<m; j++){
+                if(map[i][j] == target){
+                    // 테두리에 있는가
+                    if(i == 0 || j == 0 || i == n - 1 || j == m - 1)
+                        set.add(new int[]{i, j});
+                    // 4면 중 하나가 외부인가
+                    else if(i >= 0 && i < n && j >= 0 && j < m){
+                        if(map[i+1][j] == 'o' && dfs(map, new boolean[n][m], n, m, i+1, j)){
+                            set.add(new int[]{i, j});
+                        } else if(map[i][j+1] == 'o' && dfs(map, new boolean[n][m], n, m, i, j+1)){
+                            set.add(new int[]{i, j});
+                        } else if(map[i-1][j] == 'o' && dfs(map, new boolean[n][m], n, m, i-1, j)){
+                            set.add(new int[]{i, j});
+                        } else if(map[i][j-1] == 'o' && dfs(map, new boolean[n][m], n, m, i, j-1)){
+                            set.add(new int[]{i, j});
+                        }
+                    }
                 }
-                
-                if(map[ny][nx] != 'o')
-                    continue;
-                
-                queue.add(new Point(ny, nx));
             }
         }
         
-        while(!q.isEmpty()){
-            Point p = q.poll();
-            map[p.y][p.x] = 'o';
+        for(int[] cur : set){
+            int y = cur[0];
+            int x = cur[1];
+            map[y][x] = 'o';
         }
     }
     
-    public static void use2(int Y, int X, char[][] map, char target){
-        for(int i=1; i<=Y; i++){
-            for(int j=1; j<=X; j++){
+    public void getAllContainer(char[][] map, int n, int m, char target){
+        for(int i=0; i<n; i++){
+            for(int j=0; j<m; j++){
                 if(map[i][j] == target){
                     map[i][j] = 'o';
                 }
             }
-        }
-    }
-    
-    public static class Point {
-        int y;
-        int x;
-        
-        public Point(int y, int x){
-            this.y = y;
-            this.x = x;
         }
     }
 }
