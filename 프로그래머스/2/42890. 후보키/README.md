@@ -1,10 +1,10 @@
 # [level 2] 후보키 - 42890 
 
-[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/42890#qna) 
+[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/42890) 
 
 ### 성능 요약
 
-메모리: 324 MB, 시간: 440.09 ms
+메모리: 82.7 MB, 시간: 10.71 ms
 
 ### 구분
 
@@ -16,7 +16,7 @@
 
 ### 제출 일자
 
-2025년 08월 24일 18:07:31
+2025년 10월 31일 11:21:09
 
 ### 문제 설명
 

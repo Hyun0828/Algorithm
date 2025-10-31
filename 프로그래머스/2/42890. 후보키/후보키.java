@@ -2,75 +2,51 @@ import java.util.*;
 
 class Solution {
     
-    static Set<String> cKeys;
+    Set<Set<Integer>> result = new HashSet<>();
     
-    public int solution(String[][] relation) {
-        int columnCount = relation[0].length;
-        cKeys = new HashSet<>();
-        
-        for(int i=1; i<=columnCount; i++){
-            dfs(relation, columnCount, new HashSet<>(), i, 0);
-        }
-        
-        return cKeys.size();
+    public int solution(String[][] relation) {        
+        int col = relation[0].length;
+        for(int i=1; i<=col; i++)
+            dfs(relation, new HashSet<>(), 0, col, i);
+        return result.size();
     }
     
-    public static void isUnique(String[][] relation, Set<Integer> visited){   
-        StringBuilder sb = new StringBuilder();
-        for(Integer k : visited){
-            sb.append(k);
-        }
-        String s = sb.toString();
-
-        // 123(s)인데 13(key)이 후보키면 이런 케이스를 걸러내지 못함.
-        // for(String key : cKeys){
-            // if(s.contains(key)){
-                // return; 
-            // }
-        // }
-        
-        for (String key : cKeys) {
-            boolean isSubset = true;
-            for (int i = 0; i < key.length(); i++) {
-                if (!s.contains(String.valueOf(key.charAt(i)))) {
-                    isSubset = false;
-                    break;
-                }
-            }
-            if (isSubset) return; 
-        }
-        
-        Set<String> set = new HashSet<>();
+    // 유일성 만족 여부
+    public boolean mini(String[][] relation, Set<Integer> set){
+        Set<String> temp = new HashSet<>();
         for(int i=0; i<relation.length; i++){
-            String[] record = relation[i];
-            String temp = "";
-            for(int j=0; j<record.length; j++){
-                if(visited.contains(j)){
-                    temp += record[j];
-                }
+            String s = "";
+            for(Integer key : set){
+                s += relation[i][key];
             }
-            // 유일성을 만족하지 못하면
-            if(set.contains(temp))
-                return;
-            set.add(temp);
+            temp.add(s);
         }
         
-        // 유일성을 만족하는 키면 후보키에 등록한다.
-        cKeys.add(s);
+        return temp.size() == relation.length;
     }
     
-    public static void dfs(String[][] relation, int columnSize, Set<Integer> visited, int n, int count){
-        if(count == n){
-            // 유일성 만족 조건 확인
-            isUnique(relation, visited);
+    // 최소성
+    public boolean uniq(Set<Integer> set){
+        for(Set<Integer> temp : result){
+            if(set.containsAll(temp))
+                return false;
+        }
+        return true;
+    }
+
+    public void dfs(String[][] relation, Set<Integer> set, int start, int col, int n){
+        if(set.size() == n){
+            if(uniq(new HashSet<>(set)) && mini(relation, set)){
+                System.out.println(set);
+                result.add(set);
+            }
+            return;
         }
         
-        for(int i=0; i<columnSize; i++){
-            if(!visited.contains(i)){
-                visited.add(i);
-                dfs(relation, columnSize, visited, n, count + 1);
-                visited.remove(i);
-            }
+        for(int i=start; i<col; i++){
+            set.add(i);
+            dfs(relation, new HashSet<>(set), i+1, col, n);
+            set.remove(i);
         }
     }
 }
