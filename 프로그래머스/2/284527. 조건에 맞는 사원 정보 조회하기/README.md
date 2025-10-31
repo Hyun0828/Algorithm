@@ -1,6 +1,6 @@
 # [level 2] 조건에 맞는 사원 정보 조회하기 - 284527 
 
-[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/284527#qna) 
+[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/284527) 
 
 ### 성능 요약
 
@@ -16,7 +16,7 @@
 
 ### 제출 일자
 
-2025년 10월 15일 10:46:21
+2025년 11월 01일 08:42:27
 
 ### 문제 설명
 

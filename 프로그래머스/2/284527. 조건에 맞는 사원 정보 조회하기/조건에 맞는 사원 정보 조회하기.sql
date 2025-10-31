@@ -1,15 +1,19 @@
 with t as (
-    select emp_no, sum(score) as total
+    select
+        emp_no,
+        sum(score) as score
     from hr_grade
     group by emp_no
+    order by sum(score) desc
+    limit 1
 )
 select
-    t.total as score,
+    t.score,
     e.emp_no,
     e.emp_name,
     e.position,
     e.email
 from hr_employees e
-join t on e.emp_no = t.emp_no
-order by total desc
-limit 1
+join t on t.emp_no = e.emp_no
+
+
