@@ -2,54 +2,68 @@ import java.util.*;
 
 class Solution {
     
-    List<Integer>[] graph;
-    boolean[] visited;
-    int cnt = 0;
+    int[] rank;
+    int[] parent;
     
     public int solution(int n, int[][] wires) {
-        int answer = 1000000000;
-        
-        graph = new ArrayList[n+1];
-        visited = new boolean[n+1];
-        
-        for(int i=1; i<=n; i++)
-            graph[i] = new ArrayList<>();
+        int answer = 100000000;
         
         for(int i=0; i<wires.length; i++){
-            int a = wires[i][0];
-            int b = wires[i][1];
+            init(n);
             
-            graph[a].add(b);
-            graph[b].add(a);
-        }
-        
-        for(int i=0; i<wires.length; i++){
-            int a = wires[i][0];
-            int b = wires[i][1];
+            for(int j=0; j<wires.length; j++){
+                if(i==j)
+                    continue;
+                union(wires[j][0], wires[j][1]);
+            }
             
-            graph[a].remove(Integer.valueOf(b));
-            graph[b].remove(Integer.valueOf(a));
+            for(int j=1; j<=n; j++)
+                find(j);
             
-            dfs(1);
-            
-            answer = Math.min(answer, Math.abs(cnt - (n - cnt)));
-            
-            cnt = 0;
-            graph[a].add(b);
-            graph[b].add(a);
-            Arrays.fill(visited, false);
+            Map<Integer, Integer> map = new HashMap<>();
+            for(int j=1; j<=n; j++){
+                map.put(parent[j], map.getOrDefault(parent[j], 0) + 1);
+            }
+            int[] tmp = new int[2];
+            int idx = 0;
+            for(Integer k : map.keySet()){
+                tmp[idx++] = map.get(k);
+            }
+            answer = Math.min(answer, Math.abs(tmp[0] - tmp[1]));
         }
         
         return answer;
     }
     
-    public void dfs(int n){
-        visited[n] = true;
-        cnt++;
-        for(Integer i : graph[n]){
-            if(visited[i])
-                continue;
-            dfs(i);
+    public void init(int n){
+        rank = new int[n+1];
+        parent = new int[n+1];
+        for(int i=1; i<=n; i++){
+            rank[i] = 1;
+            parent[i] = i;
+        }
+    }
+    
+    public int find(int x){
+        if(x == parent[x])
+            return parent[x];
+        return parent[x] = find(parent[x]);
+    }
+    
+    public void union(int a, int b){
+        int pa = find(a);
+        int pb = find(b);
+        
+        if(pa == pb)
+            return;
+        
+        if(rank[pa] > rank[pb]){
+            parent[pb] = pa;
+        } else {
+            parent[pa] = pb;
+            if(rank[pa] == rank[pb]){
+                rank[pb]++;
+            }
         }
     }
 }
