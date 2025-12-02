@@ -1,10 +1,10 @@
 # [level 3] 불량 사용자 - 64064 
 
-[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/64064#qna) 
+[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/64064) 
 
 ### 성능 요약
 
-메모리: 140 MB, 시간: 214.62 ms
+메모리: 121 MB, 시간: 99.48 ms
 
 ### 구분
 
@@ -16,7 +16,7 @@
 
 ### 제출 일자
 
-2025년 10월 10일 12:41:44
+2025년 12월 02일 19:21:13
 
 ### 문제 설명
 
