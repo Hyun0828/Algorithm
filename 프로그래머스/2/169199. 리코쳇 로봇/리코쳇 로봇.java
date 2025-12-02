@@ -2,19 +2,17 @@ import java.util.*;
 
 class Solution {
     
-    int answer = 0;
-    int N;
-    int M;
+    char[][] map;
+    int[][] dis;
+    int N,M;
+    int sy,ey,sx,ex;
     
     public int solution(String[] board) {
+        int answer = 0;
+        
         N = board.length;
         M = board[0].length();
-        char[][] map = new char[N][M];
-        int sy = 0;
-        int sx = 0;
-        int ey = 0;
-        int ex = 0;
-        
+        map = new char[N][M];
         for(int i=0; i<N; i++){
             map[i] = board[i].toCharArray();
             for(int j=0; j<M; j++){
@@ -27,58 +25,48 @@ class Solution {
                 }
             }
         }
-        
-        bfs(map, sy, sx, ey, ex);
-        
-        return answer > 0 ? answer : -1;
+        bfs();
+        return dis[ey][ex] > 0 ? dis[ey][ex] : -1;
     }
     
-    public void bfs(char[][] map, int sy, int sx, int ey, int ex){
+    public void bfs(){
         Queue<int[]> queue = new LinkedList<>();
-        Set<String> visited = new HashSet<>();
-        int[] dx = {-1, 1, 0, 0};
-        int[] dy = {0, 0, -1, 1};
+        boolean[][] visited = new boolean[N][M];
+        dis = new int[N][M];
+        int[] dx = {-1,1,0,0};
+        int[] dy = {0,0,-1,1};
         
-        queue.add(new int[]{sy, sx, 0});
-        visited.add(sy + "," + sx);
-        
+        queue.add(new int[]{sy, sx});
+        visited[sy][sx] = true;
+
         while(!queue.isEmpty()){
             int[] cur = queue.poll();
             int cy = cur[0];
             int cx = cur[1];
-            int cd = cur[2];
-                        
+            
             if(cy == ey && cx == ex){
-                answer = cd;
                 break;
             }
             
             for(int i=0; i<4; i++){
-                int ny = cy + dy[i];
-                int nx = cx + dx[i];
-                int nd = cd + 1;
-                
+                int j=1;
                 while(true){
-                    if(ny < 0 || nx < 0 || ny >= N || nx >= M)
-                        break;
-                        
-                    if(map[ny][nx] == 'D'){
-                        break;
-                    }
+                    int ny = cy + dy[i] * j;
+                    int nx = cx + dx[i] * j;
                     
-                    int ay = ny + dy[i];
-                    int ax = nx + dx[i];
-                    if(ay < 0 || ax < 0 || ay >= N || ax >= M || map[ay][ax] == 'D'){
-                        if(visited.contains(ny + "," + nx)){
-                            break;
+                    if(ny < 0 || nx < 0 || ny >= N || nx >= M || map[ny][nx] == 'D'){
+                        int ry = ny - dy[i];
+                        int rx = nx - dx[i];
+
+                        if (!visited[ry][rx]) {
+                            visited[ry][rx] = true;
+                            dis[ry][rx] = dis[cy][cx] + 1;
+                            queue.add(new int[]{ry, rx});
                         }
-                        visited.add(ny + "," + nx);
-                        queue.add(new int[]{ny, nx, nd});
                         break;
                     }
                     
-                    ny += dy[i];
-                    nx += dx[i];
+                    j++;
                 }
             }
         }
